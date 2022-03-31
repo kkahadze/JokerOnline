@@ -336,9 +336,166 @@
                 this.set_calls(calls[0], calls[1], calls[2], calls[3]);
             }
             
+            get_random_call(already) {
+                var cap, rand;
+                cap = 0;
+                cap = this.cards_dealt;
+                rand = Math.floor(Math.random() * (cap + 1));
+
+                if (already !== null) {
+                    while (rand === this.cards_dealt - already) {
+                        rand = Math.floor(Math.random() * (cap + 1));
+                    }
+                }
+                return rand;
+            }
             
+            set_predicted_calls(model) {
+                var adder, call, calls, player, wild;
+                calls = [0] * 4;
 
+                for (var i = 1, _pj_a = 4; i < _pj_a; i += 1) {
+                    player = (this.dealer + i) % 4;
 
+                    if (!this.simulation && player === 0) {
+                        call = this.ask_call(this.cards_dealt);
+                    } else {
+                        if (this.get_wildsuit() === 4) {
+                            wild = 0;
+                        } else {
+                            wild = 1;
+                        }
+
+                        adder = 0;
+
+                        for (var j = 0; j < i - 1; j += 1) {
+                            adder += this.users[(player - j) % 4].called;
+                        }
+
+                        call = this.get_prediction();
+                    }
+
+                    calls[(this.dealer + i) % 4] = call;
+                    this.set_calls(calls[0], calls[1], calls[2], calls[3]);
+                }
+            }
+            
+            play_round() {
+                this.deck = new StandardJokerDeck();
+
+                if (this.model === null) {
+                    this.set_random_calls();
+                } else {
+                    this.set_predicted_calls(this.model);
+                }
+
+                this.playing_phase();
+            }
+
+            get_wild_choice(){ // ??????
+                return 0;
+            }
+
+            get_weakest(cards) {
+                var weakest;
+                weakest = cards[0];
+
+                if (cards.length === 1) {
+                    return weakest;
+                } else {
+                    for (var i = 0; i < cards.length; i += 1) {
+                        if (card.value < weakest.value) {
+                            weakest = card;
+                        }
+                    }
+                    return weakest;
+                }
+            }
+
+            get_strongest(cards) {
+                var non_joks, strongest;
+                strongest = cards[0];
+
+                if (cards.length === 1) {
+                    return strongest;
+                } else {
+                    non_joks = list(filter(x => {return x.value !== 13;}, cards));
+
+                    if (non_joks.length === 0) {
+                        return strongest;
+                    }
+
+                    for (var i = 0; i < cards.length; i++) {
+                        if (card.value > strongest.value && card.value !== 13) {
+                            strongest = card;
+                        }
+                    }
+
+                    return strongest;
+                }
+            }
+
+            get_card_choice(player_id, played, starter) {
+                var aggressive, beatable, cards, contains_wild, player;
+                player = this.users[player_id];
+                cards = this.playable(player_id, this.get_wildsuit(), this.first_suit);
+
+                if (player_id === starter) {
+                    if (cards.length === player.called - player.taken) {
+                        return this.get_strongest(cards);
+                    } else {
+                        return this.get_weakest(cards);
+                    }
+                } else {
+                    beatable = true;
+                    aggressive = player.taken !== player.called;
+                    contains_wild = false;
+
+                    for (var i = 0; i < played.length; i++) {
+
+                        if (card.suit === this.get_wildsuit()) {
+                            contains_wild = true;
+
+                            if (list(filter(x => {return x.suit === this.get_wildsuit() && played[i].value > played[i].value;}, cards)).length === 0) {
+                                beatable = false;
+                            }
+                        }
+                    }
+
+                    if (!contains_wild) {
+                        for (var i = 0; i < played.length; i++) {
+                            if (list(filter(x => {
+                            return x.suit === this.first_suit && x.value > card.value;
+                            }, cards)).length === 0) {
+                                beatable = false;
+                            } else {
+                                beatable = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (beatable && aggressive) {
+                        return this.get_strongest(cards);
+                    } else {
+                        return this.get_weakest(cards);
+                    }
+                }
+            }
+        }
+
+        function run() {
+            var game;
+            ga = new Game();
+            // game.load_model();
+
+            for (var i = 0; i < 24; i += 1) {
+                game.update_round();
+                game.deal_to_users();
+                game.set_wildcard();
+                game.play_round();
+                game.reset_users();
+            }
         }
 
         var deck = new StandardJokerDeck();
@@ -347,18 +504,6 @@
 
         
         // console.log(player.id);
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
