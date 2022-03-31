@@ -14,6 +14,95 @@
     <script src="node_modules/deck-of-cards/dist/deck.min.js"></script>
 
     <script>
+
+        class Card {
+            constructor(value, suit) {
+                this.value = value;
+                this.suit = suit;
+            }
+        }
+
+        
+        class StandardJokerDeck {
+            constructor() {
+                this.suits = [0, 1, 2, 3]; // Diamonds, Clubs, Hearts, Spades
+                this.values = [7, 8, 9, 10, 11, 12, 13, 14];
+                this.cards = [];
+                for (var i = 0; i < this.suits.length; i++){ // suits 0 - 3 (H,D,S,C)
+                    for (var j = 0; j < this.values.length; j++){ // values 7 - Ace
+                        this.cards.push(new Card(j, i));
+                    }
+                }
+                
+                // Add Sixes
+                this.cards.push(new Card(6, 0));
+                this.cards.push(new Card(6, 2));
+            
+                // Add Jokers
+                this.cards.push(new Card(13, 1));
+                this.cards.push(new Card(13, 3));
+            }
+
+            shuffle(){
+                this.cards.sort(() => (Math.random() > .5) ? 1 : -1);
+            }
+
+            get(index){
+                return this.cards[index];
+            }
+            
+            deal(location){
+                location.push(this.cards.pop());
+            }
+        }
+
+
+        class Player {
+            constructor(id_in){
+                this.id = id_in;
+                this.score = 0;
+                this.cards = [];
+                this.called = 0;
+                this.taken = 0;
+            }
+        }
+
+        class Game { 
+            constructor() { 
+                this.deck = new StandardJokerDeck();
+                this.wildcard = new Card(0,0);
+                this.first_suit = new Card(0,5);
+                this.cards_dealt = 0;
+                this.round = 0;
+                this.play = 0;
+                this.users = [new Player(0), new Player(1), new Player(2), new Player(3)];
+                this.dealer = Math.floor(Math.random() * 4);;
+                // this.simulation = Boolean(false);
+                // this.model = None
+            }
+
+            
+        }
+
+        var deck = new StandardJokerDeck();
+        var player = new Player(0);
+        var gane = new Game();
+        // console.log(player.id);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         var $container = document.getElementById('container');
         var deck = Deck();
         console.log(deck.cards)
@@ -21,13 +110,15 @@
         var card = deck.cards[0];
 
         // Add it to an html container
-        deck.mount($container);
+        // deck.mount($container);
+
+        card.mount($container)
 
         // Allow to move/drag it
-        // card.enableDragging();
+        card.enableDragging();
 
         // Allow to flip it
-        // card.setSide('front')
+        card.setSide('front')
 
         var $topbar = document.getElementById('topbar')
 
