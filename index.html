@@ -76,12 +76,91 @@
                 this.round = 0;
                 this.play = 0;
                 this.users = [new Player(0), new Player(1), new Player(2), new Player(3)];
-                this.dealer = Math.floor(Math.random() * 4);;
+                this.dealer = Math.floor(Math.random() * 4);
                 // this.simulation = Boolean(false);
                 // this.model = None
             }
 
-            
+            get_place_in_playing_order(player_id){
+                var dealer = this.dealer;
+                var out = 5;
+                for (var i = 1; i < 6; i++){
+                    if ((dealer + i) % 4 == player_id){
+                        out = i;
+                    }
+                }
+                return out;
+            }
+
+            get_wildsuit(){
+                if (this.wildcard.value != 13){
+                    return this.wildcard.suit;
+                } else {
+                    return 4;
+                }
+            }
+
+            next_dealer(){
+                return (this.dealer + 1) % 4;
+            }
+
+            set_dealer(){
+                this.dealer = (this.dealer + 1) % 4;
+            }
+
+            update_round(){ 
+                this.set_dealer();
+                
+                if (this.round == 1 && this.play == 8){
+                    this.round += 1;
+                    this.play = 1;
+                } else if (this.round == 0 && this.play == 0) {
+                    this.round = 1;
+                    this.play = 1;
+                } else if (this.round == 2 && this.play == 4) {
+                    this.round = 3;
+                    this.play = 1;
+                } else if (this.round == 3 && this.play == 8 ) {
+                    this.round = 4;
+                    this.play = 1;
+                } else {
+                    this.play += 1;
+                }
+
+                if (this.round == 1 || this.round == 3) {
+                    this.cards_dealt = this.play;
+                } else {
+                    this.cards_dealt = 9;
+                }
+            }
+
+            set_calls(u0, u1, u2, u3){
+                this.users[0].called = u0;
+                this.users[1].called = u1;
+                this.users[2].called = u2;
+                this.users[3].called = u3;
+            }
+
+            get_play_index_of_game(){
+                if (this.round == 1) {
+                    return (this.play - 1);
+                } else if (this.round == 2) {
+                    return (this.play + 7);
+                } else if (this.round == 3) {
+                    return (this.play + 11);
+                } else if (this.round == 4) {
+                    return (this.play + 19);
+                } else {
+                    return 100;
+                }
+            }
+
+            deal_to_users(){
+                this.deck.shuffle()
+                for (var i = 0; i < 4; i++) {
+                    this.deck.deal(this.users[i], this.cards_dealt);
+                }
+            }
         }
 
         var deck = new StandardJokerDeck();
