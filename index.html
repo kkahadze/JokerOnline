@@ -51,7 +51,8 @@
                 return this.cards[index];
             }
             
-            deal(location){
+            deal(location, number){
+                for(var i = 0; i < number; i++)
                 location.push(this.cards.pop());
             }
         }
@@ -98,10 +99,6 @@
                 } else {
                     return 4;
                 }
-            }
-
-            next_dealer(){
-                return (this.dealer + 1) % 4;
             }
 
             set_dealer(){
@@ -161,6 +158,41 @@
                     this.deck.deal(this.users[i], this.cards_dealt);
                 }
             }
+            
+            set_wildcard() {
+                var choice, choices;
+
+                if (this.round === 2 || this.round === 4) {
+                    choices = this.users[(this.dealer + 1) % 4].cards.slice(0, 3);
+                    choice = this.get_wild_choice(choices, dealer);
+                    this.wildcard = choices[choice];
+                } else {
+                    this.wildcard = this.deck[0];
+                }
+            }
+
+            card_to_weight(card) {
+                var weight;
+                weight = 0;
+
+                if (card.suit === this.get_wildsuit()) {
+                    weight += 200;
+                } else {
+                    if (card.suit === this.first_suit) {
+                    weight += 100;
+                    }
+                }
+
+                if (card.value === 13) {
+                    weight += 400;
+                } else {
+                    weight += (card.value);
+                }
+
+                return weight;
+            }
+
+            
         }
 
         var deck = new StandardJokerDeck();
