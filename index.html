@@ -39,8 +39,8 @@
                 this.cards.push(new Card(6, 2));
             
                 // Add Jokers
-                this.cards.push(new Card(13, 1));
-                this.cards.push(new Card(13, 3));
+                this.cards.push(new Card(15, 1));
+                this.cards.push(new Card(15, 3));
             }
 
             shuffle(){
@@ -57,7 +57,6 @@
             }
         }
 
-
         class Player {
             constructor(id_in){
                 this.id = id_in;
@@ -72,7 +71,7 @@
             constructor() { 
                 this.deck = new StandardJokerDeck();
                 this.wildcard = new Card(0,0);
-                this.first_suit = new Card(0,5);
+                this.first_suit = 5;
                 this.cards_dealt = 0;
                 this.round = 0;
                 this.play = 0;
@@ -80,6 +79,10 @@
                 this.dealer = Math.floor(Math.random() * 4);
                 // this.simulation = Boolean(false);
                 // this.model = None
+            }
+
+            get_wildcard(){
+                return this.wildcard;
             }
 
             get_place_in_playing_order(player_id){
@@ -94,8 +97,8 @@
             }
 
             get_wildsuit(){
-                if (this.wildcard.value != 13){
-                    return this.wildcard.suit;
+                if (this.get_wildcard().value != 15){
+                    return this.get_wildcard().suit;
                 } else {
                     return 4;
                 }
@@ -153,9 +156,10 @@
             }
 
             deal_to_users(){
-                this.deck.shuffle()
+                this.deck = new StandardJokerDeck();
+                this.deck.cards.sort(() => (Math.random() > .5) ? 1 : -1);
                 for (var i = 0; i < 4; i++) {
-                    this.deck.deal(this.users[i], this.cards_dealt);
+                    this.deck.deal(this.users[i].cards, this.cards_dealt);
                 }
             }
             
@@ -164,10 +168,12 @@
 
                 if (this.round === 2 || this.round === 4) {
                     choices = this.users[(this.dealer + 1) % 4].cards.slice(0, 3);
-                    choice = this.get_wild_choice(choices, dealer);
+                    choice = this.get_wild_choice(choices, this.dealer);
                     this.wildcard = choices[choice];
+                    // console.log('setting wildcard');
+                    // console.log(this.wildcard);
                 } else {
-                    this.wildcard = this.deck[0];
+                    this.wildcard = this.deck.cards[0];
                 }
             }
 
@@ -183,7 +189,7 @@
                     }
                 }
 
-                if (card.value === 13) {
+                if (card.value ===  15) {
                     weight += 400;
                 } else {
                     weight += (card.value);
@@ -198,7 +204,7 @@
                 joks = 0;
 
                 for (var i = 1; i < 5; i += 1) {
-                    if (played[(this.dealer + i) % 4].value === 13) {
+                    if (played[(this.dealer + i) % 4].value ===  15) {
                         jok = (this.dealer + i) % 4;
                         joks += 1;
                     }
@@ -219,21 +225,21 @@
 
             playable(player, wildsuit, first_suit) {
                 var firsts, joks, wilds;
-                firsts = list(filter(x => {
-                    return x.suit === first_suit && !(x.value === 13);
-                }, this.users[player].cards));
-                wilds = list(filter(x => {
-                    return x.suit === wildsuit && !(x.value === 13);
-                }, this.users[player].cards));
-                joks = list(filter(x => {
-                    return x.value === 13;
-                }, this.users[player].cards));
+                firsts = (this.users[player].cards.filter(x => {
+                    return x.suit === first_suit && !(x.value ===  15);
+                }));
+                wilds =  (this.users[player].cards.filter(x => {
+                    return x.suit === wildsuit && !(x.value ===  15);
+                }));
+                joks =  (this.users[player].cards.filter(x => {
+                    return x.value ===  15;
+                }));
 
                 if (this.first_suit === null) {
                     return this.users[player].cards;
                 } else {
-                    if (firsts === []) {
-                        if (wilds === []) {
+                    if (firsts.length === 0) {
+                        if (wilds.length === 0) {
                             return this.users[player].cards;
                         } else {
                             for (var i = 0; i < joks.length; i++) {
@@ -254,23 +260,22 @@
                 var choice, choices, played, player, starter;
                 starter = (this.dealer + 1) % 4;
 
+
                 for (var i = 0; i < this.cards_dealt; i += 1) {
-                
+                    this.first_suit = null;
                     played = [];
 
                     for (var j = 0; j < 4; j += 1) {
                         player = (starter + j) % 4;
                         choices = this.playable(player, this.get_wildsuit(), this.first_suit);
-
                         if (player === 0) {
                             choices = this.playable(player, this.get_wildsuit(), this.first_suit);
                             choice = choices[this.ask_card_choice(choices.length)]; 
-                            // ask_card_choice still needs to be implemented
                         } else {
                             choice = this.get_card_choice(player, played, starter);
                         }
 
-                        this.users[player].cards.remove(choice);
+                        this.users[player].cards.filter(function(x){x != choice});
                         played.push(choice);
 
                         if (j === 0) {
@@ -290,10 +295,9 @@
             }
 
             reset_users() {
-                for (var i = 0; i < self.users.length; i += 1) {
-                    self.users[i].called = 0;
-                    self.users[i].taken = 0;
-                    self.users[i].cards = [];
+                for (var i = 0; i < this.users.length; i += 1) {
+                    this.users[i].called = 0;
+                    this.users[i].taken = 0;
                 }
             }
 
@@ -352,12 +356,12 @@
             
             set_predicted_calls(model) {
                 var adder, call, calls, player, wild;
-                calls = [0] * 4;
+                calls = [0,0,0,0];
 
-                for (var i = 1, _pj_a = 4; i < _pj_a; i += 1) {
+                for (var i = 1; i < 4; i += 1) {
                     player = (this.dealer + i) % 4;
 
-                    if (!this.simulation && player === 0) {
+                    if (player === 0) {
                         call = this.ask_call(this.cards_dealt);
                     } else {
                         if (this.get_wildsuit() === 4) {
@@ -372,7 +376,7 @@
                             adder += this.users[(player - j) % 4].called;
                         }
 
-                        call = this.get_prediction();
+                        call = this.get_prediction(this.cards_dealt);
                     }
 
                     calls[(this.dealer + i) % 4] = call;
@@ -381,8 +385,6 @@
             }
             
             play_round() {
-                this.deck = new StandardJokerDeck();
-
                 if (this.model === null) {
                     this.set_random_calls();
                 } else {
@@ -404,8 +406,8 @@
                     return weakest;
                 } else {
                     for (var i = 0; i < cards.length; i += 1) {
-                        if (card.value < weakest.value) {
-                            weakest = card;
+                        if (cards[i].value < weakest.value) {
+                            weakest = cards[i];
                         }
                     }
                     return weakest;
@@ -419,15 +421,15 @@
                 if (cards.length === 1) {
                     return strongest;
                 } else {
-                    non_joks = list(filter(x => {return x.value !== 13;}, cards));
+                    non_joks =  (cards.filter(x => {return x.value !==  15;}, cards));
 
                     if (non_joks.length === 0) {
                         return strongest;
                     }
 
                     for (var i = 0; i < cards.length; i++) {
-                        if (card.value > strongest.value && card.value !== 13) {
-                            strongest = card;
+                        if (cards[i].value > strongest.value && cards[i].value !==  15) {
+                            strongest = cards[i];
                         }
                     }
 
@@ -441,9 +443,9 @@
                 cards = this.playable(player_id, this.get_wildsuit(), this.first_suit);
 
                 if (player_id === starter) {
-                    if (cards.length === player.called - player.taken) {
+                    if (cards.length === player.called - player.taken){             
                         return this.get_strongest(cards);
-                    } else {
+                    } else {    
                         return this.get_weakest(cards);
                     }
                 } else {
@@ -453,25 +455,28 @@
 
                     for (var i = 0; i < played.length; i++) {
 
-                        if (card.suit === this.get_wildsuit()) {
+                        if (played[i].suit === this.get_wildsuit()) {
                             contains_wild = true;
 
-                            if (list(filter(x => {return x.suit === this.get_wildsuit() && played[i].value > played[i].value;}, cards)).length === 0) {
+                            if ( (cards.filter(x => {return x.suit === this.get_wildsuit() && x.value > played[i].value;})).length === 0) {
                                 beatable = false;
                             }
                         }
                     }
 
                     if (!contains_wild) {
-                        for (var i = 0; i < played.length; i++) {
-                            if (list(filter(x => {
-                            return x.suit === this.first_suit && x.value > card.value;
-                            }, cards)).length === 0) {
-                                beatable = false;
-                            } else {
-                                beatable = true;
-                                break;
+                        var highest = new Card(0, 5);
+                        for (var i = 0; i < played.length; i++){
+                            if (played[i] == this.first_suit && played[i].value > highest.value){
+                                played[i] = highest;   
                             }
+                        }
+                        if ( (cards.filter(x => {
+                        return x.suit === this.first_suit && x.value > highest.value;
+                        })).length === 0) {
+                            beatable = false;
+                        } else {
+                            beatable = true;
                         }
                     }
 
@@ -482,14 +487,26 @@
                     }
                 }
             }
+        
+            ask_call(max){ // temp
+                return Math.floor(Math.random() * (max + 1));
+            }
+    
+            get_prediction(max){ // temp
+                return Math.floor(Math.random() * (max + 1));
+            }
+
+            ask_card_choice(){
+                return 0;
+            }
         }
 
         function run() {
-            var game;
-            ga = new Game();
+            game = new Game();
             // game.load_model();
-
+            
             for (var i = 0; i < 24; i += 1) {
+                console.log("play " + (i + 1));
                 game.update_round();
                 game.deal_to_users();
                 game.set_wildcard();
@@ -501,7 +518,7 @@
         var deck = new StandardJokerDeck();
         var player = new Player(0);
         var game = new Game();
-
+        run();
         
         // console.log(player.id);
 
@@ -509,7 +526,6 @@
 
         var $container = document.getElementById('container');
         var deck = Deck();
-        console.log(deck.cards)
         // Select the first card
         var card = deck.cards[0];
 
@@ -522,30 +538,35 @@
         card.enableDragging();
 
         // Allow to flip it
-        card.setSide('front')
+        card.setSide('front');
 
-        var $topbar = document.getElementById('topbar')
+        var $topbar = document.getElementById('topbar');
 
-        var $sort = document.createElement('button')
-        var $shuffle = document.createElement('button')
-        var $bysuit = document.createElement('button')
-        var $fan = document.createElement('button')
-        var $poker = document.createElement('button')
-        var $flip = document.createElement('button')
+        var $sort = document.createElement('button');
+        var $start = document.createElement('button');
+        var $bysuit = document.createElement('button');
+        var $fan = document.createElement('button');
+        var $poker = document.createElement('button');
+        var $flip = document.createElement('button');
 
-        $shuffle.textContent = 'Shuffle'
-        $sort.textContent = 'Sort'
-        $bysuit.textContent = 'By suit'
-        $fan.textContent = 'Fan'
-        $poker.textContent = 'Poker'
-        $flip.textContent = 'Flip'
+        $start.textContent = 'Start';
+        $sort.textContent = 'Sort';
+        $bysuit.textContent = 'By suit';
+        $fan.textContent = 'Fan';
+        $poker.textContent = 'Poker';
+        $flip.textContent = 'Flip';
 
-        $topbar.appendChild($flip)
-        $topbar.appendChild($shuffle)
-        $topbar.appendChild($bysuit)
-        $topbar.appendChild($fan)
-        $topbar.appendChild($poker)
-        $topbar.appendChild($sort)
+        $topbar.appendChild($flip);
+        $topbar.appendChild($start);
+        $topbar.appendChild($bysuit);
+        $topbar.appendChild($fan);
+        $topbar.appendChild($poker);
+        $topbar.appendChild($sort);
+
+        $start.addEventListener('click', function handleClick(){console.log("Start Clicked!")});
+
+
+
 
 
     </script>
