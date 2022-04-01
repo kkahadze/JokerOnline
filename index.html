@@ -8,7 +8,15 @@
 <body>
     <div id="main">
         <g>
-            <div id="container"></div>
+            <div id="card1"></div>
+            <div id="card2"></div>
+            <div id="card3"></div>
+            <div id="card4"></div>
+            <div id="card5"></div>
+            <div id="card6"></div>
+            <div id="card7"></div>
+            <div id="card8"></div>
+            <div id="card9"></div>
         </g>
         <div id="topbar"></div><a href="https://github.com/pakastin/deck-of-cards">
     <script src="node_modules/deck-of-cards/dist/deck.min.js"></script>
@@ -20,6 +28,14 @@
                 this.value = value;
                 this.suit = suit;
             }
+            
+            look(animatedDeck){
+                if (this.value === 15){
+                    return animatedDeck.cards[52 + this.suit % 2];
+                } else {
+                    return animatedDeck.cards[51 - (this.suit * 13) - (14 - this.value)];
+                }
+            }
         }
 
         
@@ -29,7 +45,7 @@
                 this.values = [7, 8, 9, 10, 11, 12, 13, 14];
                 this.cards = [];
                 for (var i = 0; i < this.suits.length; i++){ // suits 0 - 3 (H,D,S,C)
-                    for (var j = 0; j < this.values.length; j++){ // values 7 - Ace
+                    for (var j = 7; j < this.values.length + 7; j++){ // values 7 - Ace
                         this.cards.push(new Card(j, i));
                     }
                 }
@@ -70,7 +86,7 @@
         class Game { 
             constructor() { 
                 this.deck = new StandardJokerDeck();
-                this.wildcard = new Card(0,0);
+                this.wildcard = new Card(0,4);
                 this.first_suit = 5;
                 this.cards_dealt = 0;
                 this.round = 0;
@@ -127,9 +143,11 @@
                     this.play += 1;
                 }
 
-                if (this.round == 1 || this.round == 3) {
+                if (this.round == 1) {
                     this.cards_dealt = this.play;
-                } else {
+                } else if (this.round == 3){
+                    this.cards_dealt = 9 - this.play;
+                }else {
                     this.cards_dealt = 9;
                 }
             }
@@ -157,7 +175,7 @@
 
             deal_to_users(){
                 this.deck = new StandardJokerDeck();
-                this.deck.cards.sort(() => (Math.random() > .5) ? 1 : -1);
+                this.deck.cards = this.deck.cards.sort(() => (Math.random() > .5) ? 1 : -1);
                 for (var i = 0; i < 4; i++) {
                     this.deck.deal(this.users[i].cards, this.cards_dealt);
                 }
@@ -225,8 +243,9 @@
 
             playable(player, wildsuit, first_suit) {
                 var firsts, joks, wilds;
+                // console.log(this.users[player].cards);
                 firsts = (this.users[player].cards.filter(x => {
-                    return x.suit === first_suit && !(x.value ===  15);
+                    return (x.suit === first_suit && !(x.value ===  15));
                 }));
                 wilds =  (this.users[player].cards.filter(x => {
                     return x.suit === wildsuit && !(x.value ===  15);
@@ -259,7 +278,7 @@
             playing_phase() {
                 var choice, choices, played, player, starter;
                 starter = (this.dealer + 1) % 4;
-
+                this.wildcard = new Card(0,4);
 
                 for (var i = 0; i < this.cards_dealt; i += 1) {
                     this.first_suit = null;
@@ -298,6 +317,7 @@
                 for (var i = 0; i < this.users.length; i += 1) {
                     this.users[i].called = 0;
                     this.users[i].taken = 0;
+                    this.users[i].cards = [];
                 }
             }
 
@@ -364,11 +384,7 @@
                     if (player === 0) {
                         call = this.ask_call(this.cards_dealt);
                     } else {
-                        if (this.get_wildsuit() === 4) {
-                            wild = 0;
-                        } else {
-                            wild = 1;
-                        }
+                        
 
                         adder = 0;
 
@@ -501,45 +517,89 @@
             }
         }
 
-        function run() {
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        async function run() {
             game = new Game();
             // game.load_model();
             
             for (var i = 0; i < 24; i += 1) {
+                await sleep(500); 
                 console.log("play " + (i + 1));
                 game.update_round();
                 game.deal_to_users();
+                added = drawPlayerCards(game, Deck(true));
                 game.set_wildcard();
                 game.play_round();
+                await sleep(500); 
+                removePlayerCards(added);
                 game.reset_users();
             }
+        }
+
+        function drawPlayerCards(game, animated_deck){
+            added = []
+            switch (game.users[0].cards.length) {
+                case 1:
+                    card = game.users[0].cards[0].look(animated_deck);
+                    card.setSide('front');
+                    card.mount($card1);
+                    added.push(card);
+                    break;
+                case 2:
+                    card = game.users[0].cards[0].look(animated_deck);
+                    card.setSide('front');
+                    card.mount($card1);
+                    added.push(card);
+                    
+                    console.log(game.users[0].cards)
+                    card = game.users[0].cards[1].look(animated_deck);
+                    card.setSide('front');
+                    card.mount($card2);
+                    added.push(card);
+                    break;
+                    
+                // default:
+                //     console.log(`Sorry, we are out of ${expr}.`);
+            }
+
+            // game.users[0].cards.forEach(function (game_card, i) {
+            //     card = game_card.look(animated_deck);
+            //     card.setSide('front');
+            //     card.mount($card1);
+            //     card.animateTo({
+            //         delay: i * 2, // wait 1 second + i * 2 ms
+            //         duration: 500,
+            //         ease: 'quartOut',
+
+            //         x: i * 50,
+            //         y: 0
+            //     });
+            // });
+            return added;
+        }
+
+        function removePlayerCards(added){
+            added.forEach(
+                function(toUnmount, i){
+                    toUnmount.unmount();
+                }
+            );
         }
 
         var deck = new StandardJokerDeck();
         var player = new Player(0);
         var game = new Game();
         run();
+
+        var $card1 = document.getElementById('card1');
+        var $card2 = document.getElementById('card2');
         
-        // console.log(player.id);
-
-
-
-        var $container = document.getElementById('container');
-        var deck = Deck();
-        // Select the first card
-        var card = deck.cards[0];
-
-        // Add it to an html container
-        // deck.mount($container);
-
-        card.mount($container)
-
-        // Allow to move/drag it
-        card.enableDragging();
-
-        // Allow to flip it
-        card.setSide('front');
-
+        var gameDeck = Deck(true);
+        // var card = gameDeck.cards[0];
+    
         var $topbar = document.getElementById('topbar');
 
         var $sort = document.createElement('button');
@@ -563,11 +623,7 @@
         $topbar.appendChild($poker);
         $topbar.appendChild($sort);
 
-        $start.addEventListener('click', function handleClick(){console.log("Start Clicked!")});
-
-
-
-
+        $card1.addEventListener('click', function handleClick(){console.log("Start Clicked!")});
 
     </script>
 </body>
