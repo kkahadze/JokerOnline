@@ -17,6 +17,8 @@
             <div id="card7"></div>
             <div id="card8"></div>
             <div id="card9"></div>
+            <div id="leftPlayer"></div>
+            
         </g>
         <div id="topbar"></div><a href="https://github.com/pakastin/deck-of-cards">
     <script src="node_modules/deck-of-cards/dist/deck.min.js"></script>
@@ -31,7 +33,7 @@
             
             look(animatedDeck){
                 if (this.value === 15){
-                    return animatedDeck.cards[52 + this.suit % 2];
+                    return animatedDeck.cards[53 + (this.suit % 2)];
                 } else {
                     return animatedDeck.cards[51 - (this.suit * 13) - (14 - this.value)];
                 }
@@ -44,8 +46,8 @@
                 this.suits = [0, 1, 2, 3]; // Diamonds, Clubs, Hearts, Spades
                 this.values = [7, 8, 9, 10, 11, 12, 13, 14];
                 this.cards = [];
-                for (var i = 0; i < this.suits.length; i++){ // suits 0 - 3 (H,D,S,C)
-                    for (var j = 7; j < this.values.length + 7; j++){ // values 7 - Ace
+                for (var i = 0; i < 4; i++){ // suits 0 - 3 (H,D,S,C)
+                    for (var j = 7; j < 15; j++){ // values 7 - Ace
                         this.cards.push(new Card(j, i));
                     }
                 }
@@ -56,7 +58,7 @@
             
                 // Add Jokers
                 this.cards.push(new Card(15, 1));
-                this.cards.push(new Card(15, 3));
+                this.cards.push(new Card(15, 2));
             }
 
             shuffle(){
@@ -523,61 +525,152 @@
 
         async function run() {
             game = new Game();
+            dt = 50;
+            added = [];
+            opp = [];
             // game.load_model();
-            
-            for (var i = 0; i < 24; i += 1) {
-                await sleep(500); 
+            tmp_rd = 9
+            for (var i = 0; i < tmp_rd; i += 1) {
+                await sleep(dt); 
                 console.log("play " + (i + 1));
                 game.update_round();
                 game.deal_to_users();
                 added = drawPlayerCards(game, Deck(true));
+                opp = drawOpponentCards(game, Deck(true), opp);
+                console.log(game.users[0].cards);
                 game.set_wildcard();
                 game.play_round();
-                await sleep(500); 
-                removePlayerCards(added);
+                await sleep(dt); 
+                if (i < tmp_rd - 1){removePlayerCards(added);}
+                if (i < tmp_rd - 1){removePlayerCards(opp);}
                 game.reset_users();
             }
+        }
+
+        // function removeOpponentCards(cards){
+
+        // }
+
+        function drawLeftPlayerCards(){
+
+        }
+
+        function drawOpponentCards(game, animatedDeck, opp){
+            card1 = new Card(7, 1).look(animatedDeck);
+            card1.mount($leftPlayer);
+            
+            opp.push(card1);
+            
+            return opp;
+        }
+
+        function drawPlayerCardsAux(game, card_container,number, added, animated_deck){
+            card = game.users[0].cards[number - 1].look(animated_deck);
+            console.log(card);
+            card.mount(card_container);
+            added.push(card);
+            return added;
+        }
+
+        function space_out(added, len){
+            added.forEach(function (card, i) {
+                card.setSide("front");
+                card.animateTo({
+                    delay: 100 + 2 * i, // wait 1 second + i * 2 ms
+                    duration: 500,
+                    ease: 'quartOut',
+
+                    x: (-50 * len) + (i * 100),
+                    y: 0
+                });
+            });
         }
 
         function drawPlayerCards(game, animated_deck){
             added = []
             switch (game.users[0].cards.length) {
                 case 1:
-                    card = game.users[0].cards[0].look(animated_deck);
-                    card.setSide('front');
-                    card.mount($card1);
-                    added.push(card);
+                    added = drawPlayerCardsAux(game, $card1, 1, added, animated_deck);
+                    added[0].setSide('front');
                     break;
                 case 2:
-                    card = game.users[0].cards[0].look(animated_deck);
-                    card.setSide('front');
-                    card.mount($card1);
-                    added.push(card);
+                    added = drawPlayerCardsAux(game, $card1, 1, added, animated_deck);
+                    added = drawPlayerCardsAux(game, $card2, 2, added, animated_deck);
                     
-                    console.log(game.users[0].cards)
-                    card = game.users[0].cards[1].look(animated_deck);
-                    card.setSide('front');
-                    card.mount($card2);
-                    added.push(card);
+                    space_out(added, game.cards_dealt);
                     break;
+                case 3:
+                    added = drawPlayerCardsAux(game, $card1, 1, added, animated_deck);
+                    added = drawPlayerCardsAux(game, $card2, 2, added, animated_deck);
+                    added = drawPlayerCardsAux(game, $card3, 3, added, animated_deck);
                     
-                // default:
-                //     console.log(`Sorry, we are out of ${expr}.`);
+                    space_out(added, game.cards_dealt);
+                    break;
+                case 4:
+                    added = drawPlayerCardsAux(game, $card1, 1, added, animated_deck);
+                    added = drawPlayerCardsAux(game, $card2, 2, added, animated_deck);
+                    added = drawPlayerCardsAux(game, $card3, 3, added, animated_deck);
+                    added = drawPlayerCardsAux(game, $card4, 4, added, animated_deck);
+
+                    space_out(added, game.cards_dealt);
+                    break;
+                case 5:
+                    added = drawPlayerCardsAux(game, $card1, 1, added, animated_deck);
+                    added = drawPlayerCardsAux(game, $card2, 2, added, animated_deck);
+                    added = drawPlayerCardsAux(game, $card3, 3, added, animated_deck);
+                    added = drawPlayerCardsAux(game, $card4, 4, added, animated_deck);
+                    added = drawPlayerCardsAux(game, $card5, 5, added, animated_deck);
+                    
+                    space_out(added, game.cards_dealt);
+                    break;
+                case 6:
+                    added = drawPlayerCardsAux(game, $card1, 1, added, animated_deck);
+                    added = drawPlayerCardsAux(game, $card2, 2, added, animated_deck);
+                    added = drawPlayerCardsAux(game, $card3, 3, added, animated_deck);
+                    added = drawPlayerCardsAux(game, $card4, 4, added, animated_deck);
+                    added = drawPlayerCardsAux(game, $card5, 5, added, animated_deck);
+                    added = drawPlayerCardsAux(game, $card6, 6, added, animated_deck);
+                    
+                    space_out(added, game.cards_dealt);
+                    break;
+                case 7:
+                    added = drawPlayerCardsAux(game, $card1, 1, added, animated_deck);
+                    added = drawPlayerCardsAux(game, $card2, 2, added, animated_deck);
+                    added = drawPlayerCardsAux(game, $card3, 3, added, animated_deck);
+                    added = drawPlayerCardsAux(game, $card4, 4, added, animated_deck);
+                    added = drawPlayerCardsAux(game, $card5, 5, added, animated_deck);
+                    added = drawPlayerCardsAux(game, $card6, 6, added, animated_deck);
+                    added = drawPlayerCardsAux(game, $card7, 7, added, animated_deck);
+                    
+
+                    space_out(added, game.cards_dealt);
+                    break;
+                case 8:
+                    added = drawPlayerCardsAux(game, $card1, 1, added, animated_deck);
+                    added = drawPlayerCardsAux(game, $card2, 2, added, animated_deck);
+                    added = drawPlayerCardsAux(game, $card3, 3, added, animated_deck);
+                    added = drawPlayerCardsAux(game, $card4, 4, added, animated_deck);
+                    added = drawPlayerCardsAux(game, $card5, 5, added, animated_deck);
+                    added = drawPlayerCardsAux(game, $card6, 6, added, animated_deck);added = drawPlayerCardsAux(game, $card7, 7, added, animated_deck);
+                    added = drawPlayerCardsAux(game, $card8, 8, added, animated_deck);
+                    
+                    
+                    space_out(added, game.cards_dealt);
+                    break;
+                case 9:
+                    added = drawPlayerCardsAux(game, $card1, 1, added, animated_deck);
+                    added = drawPlayerCardsAux(game, $card2, 2, added, animated_deck);
+                    added = drawPlayerCardsAux(game, $card3, 3, added, animated_deck);
+                    added = drawPlayerCardsAux(game, $card4, 4, added, animated_deck);
+                    added = drawPlayerCardsAux(game, $card5, 5, added, animated_deck);
+                    added = drawPlayerCardsAux(game, $card6, 6, added, animated_deck);added = drawPlayerCardsAux(game, $card7, 7, added, animated_deck);
+                    added = drawPlayerCardsAux(game, $card8, 8, added, animated_deck);
+                    added = drawPlayerCardsAux(game, $card9, 9, added, animated_deck);
+                    
+                    space_out(added, game.cards_dealt);
+                    break;
+                
             }
-
-            // game.users[0].cards.forEach(function (game_card, i) {
-            //     card = game_card.look(animated_deck);
-            //     card.setSide('front');
-            //     card.mount($card1);
-            //     card.animateTo({
-            //         delay: i * 2, // wait 1 second + i * 2 ms
-            //         duration: 500,
-            //         ease: 'quartOut',
-
-            //         x: i * 50,
-            //         y: 0
-            //     });
-            // });
             return added;
         }
 
@@ -596,6 +689,17 @@
 
         var $card1 = document.getElementById('card1');
         var $card2 = document.getElementById('card2');
+        var $card3 = document.getElementById('card3');
+        var $card4 = document.getElementById('card4');
+        var $card5 = document.getElementById('card5');
+        var $card6 = document.getElementById('card6');
+        var $card7 = document.getElementById('card7');
+        var $card8 = document.getElementById('card8');
+        var $card9 = document.getElementById('card9');
+
+        var $leftPlayer = document.getElementById('leftPlayer');
+        left = d3.select("leftPlayer")
+        .attr("transform", "rotate(90)");
         
         var gameDeck = Deck(true);
         // var card = gameDeck.cards[0];
@@ -623,7 +727,17 @@
         $topbar.appendChild($poker);
         $topbar.appendChild($sort);
 
-        $card1.addEventListener('click', function handleClick(){console.log("Start Clicked!")});
+        $card1.addEventListener('click', function handleClick(){console.log("Card 1 Clicked!")});
+        $card2.addEventListener('click', function handleClick(){console.log("Card 2 Clicked!")});
+        $card3.addEventListener('click', function handleClick(){console.log("Card 3 Clicked!")});
+        $card4.addEventListener('click', function handleClick(){console.log("Card 4 Clicked!")});
+        $card5.addEventListener('click', function handleClick(){console.log("Card 5 Clicked!")});
+        $card6.addEventListener('click', function handleClick(){console.log("Card 6 Clicked!")});
+        $card7.addEventListener('click', function handleClick(){console.log("Card 7 Clicked!")});
+        $card8.addEventListener('click', function handleClick(){console.log("Card 8 Clicked!")});
+        $card9.addEventListener('click', function handleClick(){console.log("Card 9  Clicked!")});
+
+
 
     </script>
 </body>
