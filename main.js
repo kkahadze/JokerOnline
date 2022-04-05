@@ -266,6 +266,7 @@ class Game {
                 if (player === 0) {
                     choices = this.playable(player, this.get_wildsuit(), this.first_suit);
                     choice = choices[this.ask_card_choice(choices.length)];
+
                 } else {
                     choice = this.get_card_choice(player, played, starter);
                 }
@@ -480,8 +481,13 @@ class Game {
         }
     }
 
-    ask_call(max){ // temp
-        return Math.floor(Math.random() * (max + 1));
+    async ask_call(max){ // temp
+        // return Math.floor(Math.random() * (max + 1));
+        while (numSelected < 0){
+            await sleep(300);
+        }
+        console.log(numSelected);
+        return numSelected;
     }
 
     get_prediction(max){ // temp
@@ -493,6 +499,7 @@ class Game {
     }
 }
 
+// export {Card, StandardJokerDeck, Player, Game};
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -649,16 +656,20 @@ function removePlayerCards(added){
     );
 }
 
-
+start = false;
+cardChosen = false;
+numSelected = -1;
 
 async function run() {
     game = new Game();
     dt = 300;
     added = [];
     opp = [];
-    tmp_rd = 2;
+    tmp_rd = 10;
     for (var i = 0; i < tmp_rd; i += 1) {
-        await sleep(dt); 
+        while (start){
+            await sleep(dt); 
+        }
         console.log("play " + (i + 1));
         game.update_round();
         game.deal_to_users();
@@ -675,7 +686,14 @@ async function run() {
     }
 }
 
-run();
+async function reset() {
+    await sleep(dt); 
+    if (i < tmp_rd - 1){removePlayerCards(added);}
+    if (i < tmp_rd - 1){removePlayerCards(opp);}
+    if (i < tmp_rd - 1){wild.unmount();}
+    game.reset_users();
+}
+// run();
 
 var $card1 = document.getElementById('card1');
 var $card2 = document.getElementById('card2');
@@ -697,28 +715,30 @@ var gameDeck = Deck(true);
 
 var $topbar = document.getElementById('topbar');
 
-// var $sort = document.createElement('button');
-// var $start = document.createElement('button');
-// var $bysuit = document.createElement('button');
-// var $fan = document.createElement('button');
-// var $poker = document.createElement('button');
-// var $flip = document.createElement('button');
+var $sort = document.createElement('button');
+var $start = document.createElement('button');
+var $bysuit = document.createElement('button');
+var $fan = document.createElement('button');
+var $poker = document.createElement('button');
+var $flip = document.createElement('button');
 
-// $start.textContent = 'Start';
-// $sort.textContent = 'Sort';
-// $bysuit.textContent = 'By suit';
-// $fan.textContent = 'Fan';
-// $poker.textContent = 'Poker';
-// $flip.textContent = 'Flip';
+$start.textContent = 'Start';
+$sort.textContent = 'Sort';
+$bysuit.textContent = 'By suit';
+$fan.textContent = 'Fan';
+$poker.textContent = 'Poker';
+$flip.textContent = 'Flip';
 
-// $topbar.appendChild($flip);
-// $topbar.appendChild($start);
-// $topbar.appendChild($bysuit);
-// $topbar.appendChild($fan);
-// $topbar.appendChild($poker);
-// $topbar.appendChild($sort);
+$topbar.appendChild($flip);
+$topbar.appendChild($start);
+$topbar.appendChild($bysuit);
+$topbar.appendChild($fan);
+$topbar.appendChild($poker);
+$topbar.appendChild($sort);
 
 let selection = null;
+
+$start.addEventListener('click', function start(){run(); start = true;});
 
 // $card1.addEventListener('click', function handleClick(){selection = 1; clearInterval(myInterval);});
 $card2.addEventListener('click', function handleClick(){console.log("Card 2 Clicked!")});
@@ -730,4 +750,46 @@ $card7.addEventListener('click', function handleClick(){console.log("Card 7 Clic
 $card8.addEventListener('click', function handleClick(){console.log("Card 8 Clicked!")});
 $card9.addEventListener('click', function handleClick(){console.log("Card 9  Clicked!")});
 
-
+document.addEventListener('keydown', function(event) {
+    switch(event.key){
+        case '1':
+            numSelected = 1;
+			console.log(1);
+			break;
+        case '2':
+			numSelected = 2;
+			console.log(2);
+			break;
+        case '3':
+            numSelected = 3;
+			console.log(3);
+			break;
+        case '4':
+            numSelected = 4;
+			console.log(4);
+			break;
+        case '5':
+            numSelected = 5;
+			console.log(5);
+			break;
+        case '6':
+            console.log(6);
+			break;
+        case '7':
+            numSelected = 7;
+			console.log(7);
+			break;
+        case '8':
+            numSelected = 8;
+			console.log(8);
+			break;
+        case '9':
+            numSelected = 9;
+			console.log(9);
+			break;
+        case '10':
+            numSelected = 10;
+			console.log(10);
+			break;
+    }
+});
