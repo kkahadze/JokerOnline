@@ -229,6 +229,13 @@ function playOppCard(opponent, anim_card){
     
 }
 
+function resetCalled(){
+    $called0.innerHTML = "Called: -";
+    $called1.innerHTML = "Called: -";
+    $called2.innerHTML = "Called: -";
+    $called3.innerHTML = "Called: -";
+}
+
 // function playOppCard(opp_num){
 //     switch (opp_num){
 //         case 1:
@@ -366,24 +373,37 @@ class Game {
         }
     }
 
+    display_takens(zero, one, two, three){
+        $taken0.innerHTML = "Taken: " + zero;
+        $taken1.innerHTML = "Taken: " + one;
+        $taken2.innerHTML = "Taken: " + two;
+        $taken3.innerHTML = "Taken: " + three;
+    }
+
     display_calls(user, called){
         switch(user){
             case 0:
-                $called0.innerHTML = called + "";
+                $called0.innerHTML = "Called: " + called+ "";
                 break;
             case 1:
-                $called1.innerHTML = called + "";
+                $called1.innerHTML = "Called: " + called+ "";
                 break;
             case 2:
-                $called2.innerHTML = called + "";
+                $called2.innerHTML = "Called: " + called+ "";
                 break;
             case 3:
-                $called3.innerHTML = called + "";
+                $called3.innerHTML = "Called: " + called+ "";
                 break                                                       
                         
         }
     }
 
+    display_scores(){
+        $score0.innerHTML = "Score: " + this.users[0].score;
+        $score1.innerHTML = "Score: " + this.users[1].score;
+        $score2.innerHTML = "Score: " + this.users[2].score;
+        $score3.innerHTML = "Score: " + this.users[3].score;
+    }
     set_calls(u0, u1, u2, u3){
         this.users[0].called = u0;
         this.users[1].called = u1;
@@ -548,12 +568,10 @@ class Game {
         for (var i = 1; i < 5; i += 1) {
             id = (this.dealer + i) % 4;
             if (id === 0){
-                while (numSelected < 0){
+                while (callSelected < 0){
                     await sleep(1000);
                 }
-                call = numSelected;
-                console.log('numselecred')
-                console.log(numSelected);
+                call = callSelected;
                 numSelected = -1;
             } else if (i === 4) {
                 call = this.get_random_call(already);
@@ -563,8 +581,6 @@ class Game {
             }
             calls[id] = (call);
         }
-        console.log('calls');
-        console.log(calls);
         this.set_calls(calls[0], calls[1], calls[2], calls[3]);
     }
     
@@ -702,10 +718,10 @@ class Game {
     }
 
     async ask_call(max){ // temp
-        while (numSelected < 0){
+        while (callSelected < 0){
             await sleep(300);
         }
-        return numSelected;
+        return callSelected;
     }
 
     get_prediction(max){ // temp
@@ -719,12 +735,18 @@ class Game {
 
 
 async function playing_phase(game, added){
+    resetCalled();
+    while(callSelected < 0){
+        await sleep(500);
+    }
     var choice, choices, played, player, starter;
     starter = (game.dealer + 1) % 4;
     game.wildcard = new Card(0, 4);
 
     for (var i = 0; i < game.cards_dealt; i += 1) {
-        clearPlayed();     
+        clearPlayed();
+        game.display_scores();
+        game.display_takens(game.users[0].taken, game.users[1].taken, game.users[2].taken, game.users[3].taken);
         $player0Played.innerHTML = "";
         game.first_suit = null;
         played = [];
@@ -775,6 +797,7 @@ async function playing_phase(game, added){
 start = false;
 cardChosen = false;
 numSelected = -1;
+callSelected = -1;
 game = new Game();
 
 async function run() {
@@ -801,9 +824,6 @@ async function run() {
         console.log(added);
         await sleep(dt); 
         if (i < tmp_rd - 1){removePlayerCards(added);}
-        // console.log('all ops');
-        // console.log(all_opps[0]);
-        // if (i < tmp_rd - 1){removePlayerCards(all_opps[0]);removePlayerCards(all_opps[1]);removePlayerCards(all_opps[2]);}
         if (i < tmp_rd - 1){removePlayerCards(wild);}
         game.reset_users();
     }
@@ -842,31 +862,27 @@ var gameDeck = Deck(true);
 
 var $topbar = document.getElementById('topbar');
 
-var $sort = document.createElement('button');
 var $start = document.createElement('button');
-var $bysuit = document.createElement('button');
-var $fan = document.createElement('button');
-var $poker = document.createElement('button');
-var $flip = document.createElement('button');
+
+var $taken0 = document.getElementById('taken0');
+var $taken1 = document.getElementById('taken1');
+var $taken2 = document.getElementById('taken2');
+var $taken3 = document.getElementById('taken3');
 
 var $called0 = document.getElementById('called0');
 var $called1 = document.getElementById('called1');
 var $called2 = document.getElementById('called2');
 var $called3 = document.getElementById('called3');
 
-$start.textContent = 'Start';
-$sort.textContent = 'Sort';
-$bysuit.textContent = 'By suit';
-$fan.textContent = 'Fan';
-$poker.textContent = 'Poker';
-$flip.textContent = 'Flip';
+var $score0 = document.getElementById('score0');
+var $score1 = document.getElementById('score1');
+var $score2 = document.getElementById('score2');
+var $score3 = document.getElementById('score3');
 
-$topbar.appendChild($flip);
+
+
+$start.textContent = 'Start';
 $topbar.appendChild($start);
-$topbar.appendChild($bysuit);
-$topbar.appendChild($fan);
-$topbar.appendChild($poker);
-$topbar.appendChild($sort);
 
 $start.addEventListener('click', function start(){run(); start = true;});
 
@@ -885,42 +901,42 @@ $card9.addEventListener('click', function handleClick(){numSelected = 9;console.
 document.addEventListener('keydown', function(event) {
     switch(event.key){
         case '1':
-            numSelected = 1;
+            callSelected = 1;
 			console.log(1);
 			break;
         case '2':
-			numSelected = 2;
+			callSelected = 2;
 			console.log(2);
 			break;
         case '3':
-            numSelected = 3;
+            callSelected = 3;
 			console.log(3);
 			break;
         case '4':
-            numSelected = 4;
+            callSelected = 4;
 			console.log(4);
 			break;
         case '5':
-            numSelected = 5;
+            callSelected = 5;
 			console.log(5);
 			break;
         case '6':
             console.log(6);
 			break;
         case '7':
-            numSelected = 7;
+            callSelected = 7;
 			console.log(7);
 			break;
         case '8':
-            numSelected = 8;
+            callSelected = 8;
 			console.log(8);
 			break;
         case '9':
-            numSelected = 9;
+            callSelected = 9;
 			console.log(9);
 			break;
         case '0':
-            numSelected = 0;
+            callSelected = 0;
 			console.log(0);
 			break;
     }
