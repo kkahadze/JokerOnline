@@ -19,16 +19,23 @@ function drawOppHand(game, animated_deck, opp, cont, seed){
 }
 
 function drawOpponentCards(game, animatedDeck, opp){
-    opp = drawOppHand(game, animatedDeck, opp, $leftPlayer,1);
-    opp = drawOppHand(game, animatedDeck, opp, $topPlayer, 2);
-    opp = drawOppHand(game, animatedDeck, opp, $rightPlayer, 3);
-    return opp;
+
+    
+    all = [];
+    one = drawOppHand(game, animatedDeck, opp, $leftPlayer,1);
+    two = drawOppHand(game, animatedDeck, opp, $topPlayer, 2);
+    three = drawOppHand(game, animatedDeck, opp, $rightPlayer, 3);
+    all.push(one);
+    all.push(two);
+    all.push(three);
+    return all;
 }
 
 function drawPlayerCardsAux(game, card_container,number, added, animated_deck){
     card = game.users[0].cards[number - 1].look(animated_deck);
     // console.log(card);
     card.mount(card_container);
+    card.setSide('front')
     added.push(card);
     return added;
 }
@@ -72,7 +79,20 @@ function space_out(added, len){
     });
 }
 
+function clearPlayerCards(){
+    $card1.innerHTML = "";
+    $card2.innerHTML = "";
+    $card3.innerHTML = "";
+    $card4.innerHTML = "";
+    $card5.innerHTML = "";
+    $card6.innerHTML = "";
+    $card7.innerHTML = "";
+    $card8.innerHTML = "";
+    $card9.innerHTML = ""; 
+}
+
 function drawPlayerCards(game, animated_deck){
+    // clearPlayerCards();
     switch (game.users[0].cards.length) {
         case 1:
             added = drawPlayerCardsAux(game, $card1, 1, added, animated_deck);
@@ -174,6 +194,13 @@ function playUserCard(anim_card){
     anim_card.unmount();
     anim_card.mount($player0Played);
     anim_card.setSide('front');
+}
+
+function playOppCard(opp_num){
+    switch (opp_num){
+        case 1:
+            
+    }
 }
 
 class Card {
@@ -717,16 +744,27 @@ async function playing_phase(game, added){
                 playUserCard(anim_card);
                 numSelected = -1;
                 removePlayerCards(added);
-                console.log('prefilter');
-                console.log(added);
-                added = added.filter(x => x != anim_card);
-                console.log('added');
-                console.log(added);
-                game.users[player].cards = game.users[player].cards.filter(function(x){x != choice});
+                // console.log('prefilter');
+                // console.log(added);
+                // console.log('card');
+                // console.log(anim_card);
+                added = added.filter((x) => {console.log(x);return x.pos != anim_card.pos});
+                // console.log('added');
+                // console.log(added);
+                // console.log("player cards")
+                // console.log(game.users[player].cards);
+                // console.log('choice');
+                // console.log(choice);
+                game.users[player].cards = game.users[player].cards.filter(function(x){return x != choice});
                 drawPlayerCards(game, Deck(true));
             } else {
-                game.users[player].cards.filter(function(x){x != choice});
+                await sleep(300);
                 choice = game.get_card_choice(player, played, starter);
+                anim_card = choice.look(Deck(true));
+                // removePlayerCards(added);
+                game.users[player].cards.filter(function(x){x != choice});
+                drawOpponentCards(game,Deck(true),[]);
+
             }
 
             
@@ -766,14 +804,14 @@ async function run() {
         game.update_round();
         game.deal_to_users();
         added = drawPlayerCards(game, Deck(true));
-        opp = drawOpponentCards(game, Deck(true), opp);
+        all_opps = drawOpponentCards(game, Deck(true), opp);
         game.set_wildcard();
         wild = drawWild(game.wildcard, Deck(true));
         game.set_player_calls();
         added = await playing_phase(game, added);
         await sleep(dt); 
         if (i < tmp_rd - 1){removePlayerCards(added);}
-        if (i < tmp_rd - 1){removePlayerCards(opp);}
+        if (i < tmp_rd - 1){removePlayerCards(all_opps[0]);removePlayerCards(all_opps[1]);removePlayerCards(all_opps[2]);}
         if (i < tmp_rd - 1){removePlayerCards(wild);}
         game.reset_users();
     }
