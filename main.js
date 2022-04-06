@@ -7,7 +7,7 @@ function drawOppHand(game, animated_deck, opp, cont, seed){
         newCard = new Card(6 + i, 0 + seed).look(animated_deck); 
         newCard.mount(cont);
         newCard.animateTo({
-            delay: 200 + i * 20, // wait 1 second + i * 2 ms
+            delay: 200 + i * 40, // wait 1 second + i * 2 ms
             duration: 100,
             ease: 'quartOut',
             x: -10 * game.cards_dealt + i * 20,
@@ -170,8 +170,10 @@ function removePlayerCards(added){
     );
 }
 
-function playUserCard(selection){
-
+function playUserCard(anim_card){
+    anim_card.unmount();
+    anim_card.mount($player0Played);
+    anim_card.setSide('front');
 }
 
 class Card {
@@ -304,11 +306,35 @@ class Game {
         }
     }
 
+    display_calls(user, called){
+        switch(user){
+            case 0:
+                $called0.innerHTML = called + "";
+                break;
+            case 1:
+                $called1.innerHTML = called + "";
+                break;
+            case 2:
+                $called2.innerHTML = called + "";
+                break;
+            case 3:
+                $called3.innerHTML = called + "";
+                break
+                        
+        }
+    }
+
     set_calls(u0, u1, u2, u3){
         this.users[0].called = u0;
         this.users[1].called = u1;
         this.users[2].called = u2;
         this.users[3].called = u3;
+
+        this.display_calls(0, u0);
+        this.display_calls(1, u1);
+        this.display_calls(2, u2);
+        this.display_calls(3, u3);
+
     }
 
     get_play_index_of_game(){
@@ -456,7 +482,7 @@ class Game {
 
     async set_player_calls() {
         var already, call, calls, id;
-        calls = [];
+        calls = Array(4);
         already = 0;
 
         for (var i = 1; i < 5; i += 1) {
@@ -465,8 +491,9 @@ class Game {
                 while (numSelected < 0){
                     await sleep(1000);
                 }
-                choice = choices[numSelected - 1];
-
+                call = numSelected;
+                console.log('numselecred')
+                console.log(numSelected);
                 numSelected = -1;
             } else if (i === 4) {
                 call = this.get_random_call(already);
@@ -474,8 +501,10 @@ class Game {
                 call = this.get_random_call(null);
                 already += call;
             }
-            calls.push(call);
+            calls[id] = (call);
         }
+        console.log('calls');
+        console.log(calls);
         this.set_calls(calls[0], calls[1], calls[2], calls[3]);
     }
     
@@ -627,52 +656,52 @@ class Game {
         return 0;
     }
 
-    playing_phase() {
-        var choice, choices, played, player, starter;
-        starter = (this.dealer + 1) % 4;
-        this.wildcard = new Card(0, 4);
+    // playing_phase() {
+    //     var choice, choices, played, player, starter;
+    //     starter = (this.dealer + 1) % 4;
+    //     this.wildcard = new Card(0, 4);
 
-        for (var i = 0; i < this.cards_dealt; i += 1) {
-            this.first_suit = null;
-            played = [];
+    //     for (var i = 0; i < this.cards_dealt; i += 1) {
+    //         this.first_suit = null;
+    //         played = [];
 
-            for (var j = 0; j < 4; j += 1) {
-                player = (starter + j) % 4;
-                choices = this.playable(player, this.get_wildsuit(), this.first_suit);
-                if (player === 0) {
-                    choices = this.playable(player, this.get_wildsuit(), this.first_suit);
-                    choice = choices[this.ask_card_choice(choices.length)];
-                } else {
-                    choice = this.get_card_choice(player, played, starter);
-                }
+    //         for (var j = 0; j < 4; j += 1) {
+    //             player = (starter + j) % 4;
+    //             choices = this.playable(player, this.get_wildsuit(), this.first_suit);
+    //             if (player === 0) {
+    //                 choices = this.playable(player, this.get_wildsuit(), this.first_suit);
+    //                 choice = choices[this.ask_card_choice(choices.length)];
+    //             } else {
+    //                 choice = this.get_card_choice(player, played, starter);
+    //             }
 
-                this.users[player].cards.filter(function(x){x != choice});
-                played.push(choice);
+    //             this.users[player].cards.filter(function(x){x != choice});
+    //             played.push(choice);
 
-                if (j === 0) {
-                    this.first_suit = choice.suit;
-                }
-            }
+    //             if (j === 0) {
+    //                 this.first_suit = choice.suit;
+    //             }
+    //         }
 
-            played = played.slice(4 - starter) + played.slice(0, 4 - starter);
-            starter = this.compute_winner(played);
-            this.users[starter].taken += 1;
-            this.first_suit = null;
-        }
+    //         played = played.slice(4 - starter) + played.slice(0, 4 - starter);
+    //         starter = this.compute_winner(played);
+    //         this.users[starter].taken += 1;
+    //         this.first_suit = null;
+    //     }
 
-        for (var i = 0; i < 4; i += 1) {
-            this.users[i].score += this.get_player_score(i);
-        }
-    }
+    //     for (var i = 0; i < 4; i += 1) {
+    //         this.users[i].score += this.get_player_score(i);
+    //     }
+    // }
 }
 
-async function playing_phase(game){
+async function playing_phase(game, added){
     var choice, choices, played, player, starter;
     starter = (game.dealer + 1) % 4;
     game.wildcard = new Card(0, 4);
 
     for (var i = 0; i < game.cards_dealt; i += 1) {
-
+        $player0Played.innerHTML = "";
         game.first_suit = null;
         played = [];
 
@@ -684,13 +713,23 @@ async function playing_phase(game){
                     await sleep(1000);
                 }
                 choice = choices[numSelected - 1];
-
+                anim_card = choice.look(Deck(true));
+                playUserCard(anim_card);
                 numSelected = -1;
+                removePlayerCards(added);
+                console.log('prefilter');
+                console.log(added);
+                added = added.filter(x => x != anim_card);
+                console.log('added');
+                console.log(added);
+                game.users[player].cards = game.users[player].cards.filter(function(x){x != choice});
+                drawPlayerCards(game, Deck(true));
             } else {
+                game.users[player].cards.filter(function(x){x != choice});
                 choice = game.get_card_choice(player, played, starter);
             }
 
-            game.users[player].cards.filter(function(x){x != choice});
+            
             played.push(choice);
 
             if (j === 0) {
@@ -706,6 +745,7 @@ async function playing_phase(game){
     for (var i = 0; i < 4; i += 1) {
         game.users[i].score += game.get_player_score(i);
     }
+    return added;
 }
 
 start = false;
@@ -730,7 +770,7 @@ async function run() {
         game.set_wildcard();
         wild = drawWild(game.wildcard, Deck(true));
         game.set_player_calls();
-        await playing_phase(game);
+        added = await playing_phase(game, added);
         await sleep(dt); 
         if (i < tmp_rd - 1){removePlayerCards(added);}
         if (i < tmp_rd - 1){removePlayerCards(opp);}
@@ -767,6 +807,11 @@ var $player1Played = document.getElementById('player1Played');
 var $player2Played = document.getElementById('player2Played');
 var $player3Played = document.getElementById('player3Played');
 
+var $player0Called = document.getElementById('player0Called');
+var $player1Called = document.getElementById('player1Called');
+var $player2Called = document.getElementById('player2Called');
+var $player3Called = document.getElementById('player3Called');
+
 var gameDeck = Deck(true);
 
 var $topbar = document.getElementById('topbar');
@@ -777,6 +822,11 @@ var $bysuit = document.createElement('button');
 var $fan = document.createElement('button');
 var $poker = document.createElement('button');
 var $flip = document.createElement('button');
+
+var $called0 = document.getElementById('called0');
+var $called1 = document.getElementById('called1');
+var $called2 = document.getElementById('called2');
+var $called3 = document.getElementById('called3');
 
 $start.textContent = 'Start';
 $sort.textContent = 'Sort';
@@ -843,9 +893,9 @@ document.addEventListener('keydown', function(event) {
             numSelected = 9;
 			console.log(9);
 			break;
-        case '10':
-            numSelected = 10;
-			console.log(10);
+        case '0':
+            numSelected = 0;
+			console.log(0);
 			break;
     }
 });
