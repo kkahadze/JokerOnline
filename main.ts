@@ -1,165 +1,7 @@
-function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-function drawOppHand(game, animated_deck, opp, cont, seed){
-    for (var i = 0; i < game.cards_dealt; i++){
-        newCard = new Card(6 + i, 0 + seed).look(animated_deck); 
-        newCard.mount(cont);
-        newCard.animateTo({
-            delay: 200 + i * 20, // wait 1 second + i * 2 ms
-            duration: 100,
-            ease: 'quartOut',
-            x: -10 * game.cards_dealt + i * 20,
-            y: 0,
-        });
-        opp.push(newCard);
-    }            
-    return opp;
-}
-
-function drawOpponentCards(game, animatedDeck, opp){
-    opp = drawOppHand(game, animatedDeck, opp, $leftPlayer,1);
-    opp = drawOppHand(game, animatedDeck, opp, $topPlayer, 2);
-    opp = drawOppHand(game, animatedDeck, opp, $rightPlayer, 3);
-    return opp;
-}
-
-function drawPlayerCardsAux(game, card_container,number, added, animated_deck){
-    card = game.users[0].cards[number - 1].look(animated_deck);
-    // console.log(card);
-    card.mount(card_container);
-    added.push(card);
-    return added;
-}
-
-function drawWild(card, animatedDeck){
-    if (card === new Card(0, 4)){
-        animatedCard = animatedDeck.cards[52];
-    } else {
-        animatedCard = card.look(animatedDeck);
-    }
-    animatedCard.setSide('front');
-    animatedCard.mount($deck);
-    return animatedCard;
-}
-
-function space_out(added, len){
-    added.forEach(function (card, i) {
-        card.setSide("front");
-        card.animateTo({
-            delay: 10 + 2 * i, // wait 1 second + i * 2 ms
-            duration: 200,
-
-            ease: 'quartOut',
-            x: added.length * -27 + (i * 30),
-            y: 0
-        });
-    });
-}
-
-function drawPlayerCards(game, animated_deck){
-    switch (game.users[0].cards.length) {
-        case 1:
-            added = drawPlayerCardsAux(game, $card1, 1, added, animated_deck);
-            added[0].setSide('front');
-            break;
-        case 2:
-            added = drawPlayerCardsAux(game, $card1, 1, added, animated_deck);
-            added = drawPlayerCardsAux(game, $card2, 2, added, animated_deck);
-            
-            space_out(added, game.cards_dealt);
-            break;
-        case 3:
-            added = drawPlayerCardsAux(game, $card1, 1, added, animated_deck);
-            added = drawPlayerCardsAux(game, $card2, 2, added, animated_deck);
-            added = drawPlayerCardsAux(game, $card3, 3, added, animated_deck);
-            
-            space_out(added, game.cards_dealt);
-            break;
-        case 4:
-            added = drawPlayerCardsAux(game, $card1, 1, added, animated_deck);
-            added = drawPlayerCardsAux(game, $card2, 2, added, animated_deck);
-            added = drawPlayerCardsAux(game, $card3, 3, added, animated_deck);
-            added = drawPlayerCardsAux(game, $card4, 4, added, animated_deck);
-
-            space_out(added, game.cards_dealt);
-            break;
-        case 5:
-            added = drawPlayerCardsAux(game, $card1, 1, added, animated_deck);
-            added = drawPlayerCardsAux(game, $card2, 2, added, animated_deck);
-            added = drawPlayerCardsAux(game, $card3, 3, added, animated_deck);
-            added = drawPlayerCardsAux(game, $card4, 4, added, animated_deck);
-            added = drawPlayerCardsAux(game, $card5, 5, added, animated_deck);
-            
-            space_out(added, game.cards_dealt);
-            break;
-        case 6:
-            added = drawPlayerCardsAux(game, $card1, 1, added, animated_deck);
-            added = drawPlayerCardsAux(game, $card2, 2, added, animated_deck);
-            added = drawPlayerCardsAux(game, $card3, 3, added, animated_deck);
-            added = drawPlayerCardsAux(game, $card4, 4, added, animated_deck);
-            added = drawPlayerCardsAux(game, $card5, 5, added, animated_deck);
-            added = drawPlayerCardsAux(game, $card6, 6, added, animated_deck);
-            
-            space_out(added, game.cards_dealt);
-            break;
-        case 7:
-            added = drawPlayerCardsAux(game, $card1, 1, added, animated_deck);
-            added = drawPlayerCardsAux(game, $card2, 2, added, animated_deck);
-            added = drawPlayerCardsAux(game, $card3, 3, added, animated_deck);
-            added = drawPlayerCardsAux(game, $card4, 4, added, animated_deck);
-            added = drawPlayerCardsAux(game, $card5, 5, added, animated_deck);
-            added = drawPlayerCardsAux(game, $card6, 6, added, animated_deck);
-            added = drawPlayerCardsAux(game, $card7, 7, added, animated_deck);
-            
-
-            space_out(added, game.cards_dealt);
-            break;
-        case 8:
-            added = drawPlayerCardsAux(game, $card1, 1, added, animated_deck);
-            added = drawPlayerCardsAux(game, $card2, 2, added, animated_deck);
-            added = drawPlayerCardsAux(game, $card3, 3, added, animated_deck);
-            added = drawPlayerCardsAux(game, $card4, 4, added, animated_deck);
-            added = drawPlayerCardsAux(game, $card5, 5, added, animated_deck);
-            added = drawPlayerCardsAux(game, $card6, 6, added, animated_deck);
-            added = drawPlayerCardsAux(game, $card7, 7, added, animated_deck);
-            added = drawPlayerCardsAux(game, $card8, 8, added, animated_deck);
-            
-            
-            space_out(added, game.cards_dealt);
-            break;
-        case 9:
-            added = drawPlayerCardsAux(game, $card1, 1, added, animated_deck);
-            added = drawPlayerCardsAux(game, $card2, 2, added, animated_deck);
-            added = drawPlayerCardsAux(game, $card3, 3, added, animated_deck);
-            added = drawPlayerCardsAux(game, $card4, 4, added, animated_deck);
-            added = drawPlayerCardsAux(game, $card5, 5, added, animated_deck);
-            added = drawPlayerCardsAux(game, $card6, 6, added, animated_deck);
-            added = drawPlayerCardsAux(game, $card7, 7, added, animated_deck);
-            added = drawPlayerCardsAux(game, $card8, 8, added, animated_deck);
-            added = drawPlayerCardsAux(game, $card9, 9, added, animated_deck);
-            
-            space_out(added, game.cards_dealt);
-            break;
-        
-    }
-    return added;
-}
-
-function removePlayerCards(added){
-    added.forEach(
-        function(toUnmount, i){
-            toUnmount.unmount();
-        }
-    );
-}
-
-function playCard(selection){
-
-}
 
 class Card {
+    value: number;
+    suit: number;
     constructor(value, suit) {
         this.value = value;
         this.suit = suit;
@@ -177,6 +19,9 @@ class Card {
 }
 
 class StandardJokerDeck {
+    suits: Number[];
+    values: Number[];
+    cards: Card[];
     constructor() {
         this.suits = [0, 1, 2, 3]; // Diamonds, Clubs, Hearts, Spades
         this.values = [7, 8, 9, 10, 11, 12, 13, 14];
@@ -211,6 +56,11 @@ class StandardJokerDeck {
 }
 
 class Player {
+    id: number;
+    score: number;
+    cards: Card[];
+    called: number;
+    taken: number;
     constructor(id_in){
         this.id = id_in;
         this.score = 0;
@@ -221,6 +71,14 @@ class Player {
 }
 
 class Game { 
+    deck: StandardJokerDeck;
+    wildcard: Card;
+    first_suit: number;
+    cards_dealt: number;
+    round: number;
+    play: number;
+    users: Player[];
+    dealer: number;
     constructor() { 
         this.deck = new StandardJokerDeck();
         this.wildcard = new Card(0,4);
@@ -411,6 +269,45 @@ class Game {
         }
     }
 
+    playing_phase() {
+        var choice, choices, played, player, starter;
+        starter = (this.dealer + 1) % 4;
+        this.wildcard = new Card(0, 4);
+
+        for (var i = 0; i < this.cards_dealt; i += 1) {
+            this.first_suit = null;
+            played = [];
+
+            for (var j = 0; j < 4; j += 1) {
+                player = (starter + j) % 4;
+                choices = this.playable(player, this.get_wildsuit(), this.first_suit);
+                if (player === 0) {
+                    choices = this.playable(player, this.get_wildsuit(), this.first_suit);
+                    choice = choices[this.ask_card_choice(choices.length)];
+
+                } else {
+                    choice = this.get_card_choice(player, played, starter);
+                }
+
+                this.users[player].cards.filter(function(x){x != choice});
+                played.push(choice);
+
+                if (j === 0) {
+                    this.first_suit = choice.suit;
+                }
+            }
+
+            played = played.slice(4 - starter) + played.slice(0, 4 - starter);
+            starter = this.compute_winner(played);
+            this.users[starter].taken += 1;
+            this.first_suit = null;
+        }
+
+        for (var i = 0; i < 4; i += 1) {
+            this.users[i].score += this.get_player_score(i);
+        }
+    }
+
     reset_users() {
         for (var i = 0; i < this.users.length; i += 1) {
             this.users[i].called = 0;
@@ -497,6 +394,16 @@ class Game {
             this.set_calls(calls[0], calls[1], calls[2], calls[3]);
         }
     }
+    
+    play_round() {
+        if (this.model === null) {
+            this.set_random_calls();
+        } else {
+            this.set_predicted_calls(this.model);
+        }
+
+        this.playing_phase();
+    }
 
     get_wild_choice(){ // ??????
         return 0;
@@ -558,8 +465,7 @@ class Game {
             contains_wild = false;
 
             for (var i = 0; i < played.length; i++) {
-            //     console.log('played');
-            //     console.log(played);
+
                 if (played[i].suit === this.get_wildsuit()) {
                     contains_wild = true;
 
@@ -609,114 +515,179 @@ class Game {
     ask_card_choice(){
         return 0;
     }
-    playing_phase() {
-        var choice, choices, played, player, starter;
-        starter = (this.dealer + 1) % 4;
-        this.wildcard = new Card(0, 4);
-
-        for (var i = 0; i < this.cards_dealt; i += 1) {
-            this.first_suit = null;
-            played = [];
-
-            for (var j = 0; j < 4; j += 1) {
-                player = (starter + j) % 4;
-                choices = this.playable(player, this.get_wildsuit(), this.first_suit);
-                if (player === 0) {
-                    choices = this.playable(player, this.get_wildsuit(), this.first_suit);
-                    // console.log('playable');
-                    // console.log(playable);
-                    // var num = getCardChoice();
-                    choice = choices[this.ask_card_choice(choices.length)];
-                    // choice = choices[num];
-                    
-                    
-                } else {
-                    choice = this.get_card_choice(player, played, starter);
-                }
-
-                this.users[player].cards.filter(function(x){x != choice});
-                played.push(choice);
-
-                if (j === 0) {
-                    this.first_suit = choice.suit;
-                }
-            }
-
-            played = played.slice(4 - starter) + played.slice(0, 4 - starter);
-            starter = this.compute_winner(played);
-            this.users[starter].taken += 1;
-            this.first_suit = null;
-        }
-
-        for (var i = 0; i < 4; i += 1) {
-            this.users[i].score += this.get_player_score(i);
-        }
-    }
 }
 
-async function playing_phase(game){
-    console.log('playing phase');
-    var choice, choices, played, player, starter;
-    starter = (game.dealer + 1) % 4;
-    game.wildcard = new Card(0, 4);
-
-    for (var i = 0; i < game.cards_dealt; i += 1) {
-
-        game.first_suit = null;
-        played = [];
-
-        for (var j = 0; j < 4; j += 1) {
-            player = (starter + j) % 4;
-            choices = game.playable(player, game.get_wildsuit(), game.first_suit);
-            if (player === 0) {
-                while (numSelected < 0){
-                    await sleep(1000);
-                }
-                choice = choices[numSelected - 1];
-
-                numSelected = -1;
-            } else {
-                console.log('other');
-                choice = game.get_card_choice(player, played, starter);
-            }
-
-            game.users[player].cards.filter(function(x){x != choice});
-            played.push(choice);
-
-            if (j === 0) {
-                game.first_suit = choice.suit;
-            }
-        }
-
-        console.log('i');
-        console.log(i);
-
-        played = played.slice(4 - starter) + played.slice(0, 4 - starter);
-        starter = game.compute_winner(played);
-        game.users[starter].taken += 1;
-        game.first_suit = null;
-    }
-
-    for (var i = 0; i < 4; i += 1) {
-        game.users[i].score += game.get_player_score(i);
-    }
+// export {Card, StandardJokerDeck, Player, Game};
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+function drawOppHand(game, animated_deck, opp, cont, seed){
+    for (var i = 0; i < game.cards_dealt; i++){
+        newCard = new Card(6 + i, 0 + seed).look(animated_deck); 
+        newCard.mount(cont);
+        newCard.animateTo({
+            delay: 200 + i * 20, // wait 1 second + i * 2 ms
+            duration: 100,
+            ease: 'quartOut',
+            x: -10 * game.cards_dealt + i * 20,
+            y: 0,
+        });
+        opp.push(newCard);
+    }            
+    return opp;
+}
+
+function drawOpponentCards(game, animatedDeck, opp){
+    opp = drawOppHand(game, animatedDeck, opp, $leftPlayer,1);
+    opp = drawOppHand(game, animatedDeck, opp, $topPlayer, 2);
+    opp = drawOppHand(game, animatedDeck, opp, $rightPlayer, 3);
+    return opp;
+}
+
+function drawPlayerCardsAux(game, card_container,number, added, animated_deck){
+    card = game.users[0].cards[number - 1].look(animated_deck);
+    // console.log(card);
+    card.mount(card_container);
+    added.push(card);
+    return added;
+}
+
+function drawWild(card, animatedDeck){
+    if (card === new Card(0, 4)){
+        animatedCard = animatedDeck.cards[52];
+    } else {
+        animatedCard = card.look(animatedDeck);
+    }
+    animatedCard.setSide('front');
+    animatedCard.mount($deck);
+    return animatedCard;
+}
+
+function space_out(added, len){
+    added.forEach(function (card, i) {
+        card.setSide("front");
+        card.animateTo({
+            delay: 100 + 2 * i, // wait 1 second + i * 2 ms
+            duration: 500,
+            ease: 'quartOut',
+
+            x: (-50 * len) + (i * 100),
+            y: 0
+        });
+    });
+}
+
+function drawPlayerCards(game, animated_deck){
+    added = []
+    switch (game.users[0].cards.length) {
+        case 1:
+            added = drawPlayerCardsAux(game, $card1, 1, added, animated_deck);
+            added[0].setSide('front');
+            break;
+        case 2:
+            added = drawPlayerCardsAux(game, $card1, 1, added, animated_deck);
+            added = drawPlayerCardsAux(game, $card2, 2, added, animated_deck);
+            
+            space_out(added, game.cards_dealt);
+            break;
+        case 3:
+            added = drawPlayerCardsAux(game, $card1, 1, added, animated_deck);
+            added = drawPlayerCardsAux(game, $card2, 2, added, animated_deck);
+            added = drawPlayerCardsAux(game, $card3, 3, added, animated_deck);
+            
+            space_out(added, game.cards_dealt);
+            break;
+        case 4:
+            added = drawPlayerCardsAux(game, $card1, 1, added, animated_deck);
+            added = drawPlayerCardsAux(game, $card2, 2, added, animated_deck);
+            added = drawPlayerCardsAux(game, $card3, 3, added, animated_deck);
+            added = drawPlayerCardsAux(game, $card4, 4, added, animated_deck);
+
+            space_out(added, game.cards_dealt);
+            break;
+        case 5:
+            added = drawPlayerCardsAux(game, $card1, 1, added, animated_deck);
+            added = drawPlayerCardsAux(game, $card2, 2, added, animated_deck);
+            added = drawPlayerCardsAux(game, $card3, 3, added, animated_deck);
+            added = drawPlayerCardsAux(game, $card4, 4, added, animated_deck);
+            added = drawPlayerCardsAux(game, $card5, 5, added, animated_deck);
+            
+            space_out(added, game.cards_dealt);
+            break;
+        case 6:
+            added = drawPlayerCardsAux(game, $card1, 1, added, animated_deck);
+            added = drawPlayerCardsAux(game, $card2, 2, added, animated_deck);
+            added = drawPlayerCardsAux(game, $card3, 3, added, animated_deck);
+            added = drawPlayerCardsAux(game, $card4, 4, added, animated_deck);
+            added = drawPlayerCardsAux(game, $card5, 5, added, animated_deck);
+            added = drawPlayerCardsAux(game, $card6, 6, added, animated_deck);
+            
+            space_out(added, game.cards_dealt);
+            break;
+        case 7:
+            added = drawPlayerCardsAux(game, $card1, 1, added, animated_deck);
+            added = drawPlayerCardsAux(game, $card2, 2, added, animated_deck);
+            added = drawPlayerCardsAux(game, $card3, 3, added, animated_deck);
+            added = drawPlayerCardsAux(game, $card4, 4, added, animated_deck);
+            added = drawPlayerCardsAux(game, $card5, 5, added, animated_deck);
+            added = drawPlayerCardsAux(game, $card6, 6, added, animated_deck);
+            added = drawPlayerCardsAux(game, $card7, 7, added, animated_deck);
+            
+
+            space_out(added, game.cards_dealt);
+            break;
+        case 8:
+            added = drawPlayerCardsAux(game, $card1, 1, added, animated_deck);
+            added = drawPlayerCardsAux(game, $card2, 2, added, animated_deck);
+            added = drawPlayerCardsAux(game, $card3, 3, added, animated_deck);
+            added = drawPlayerCardsAux(game, $card4, 4, added, animated_deck);
+            added = drawPlayerCardsAux(game, $card5, 5, added, animated_deck);
+            added = drawPlayerCardsAux(game, $card6, 6, added, animated_deck);added = drawPlayerCardsAux(game, $card7, 7, added, animated_deck);
+            added = drawPlayerCardsAux(game, $card8, 8, added, animated_deck);
+            
+            
+            space_out(added, game.cards_dealt);
+            break;
+        case 9:
+            added = drawPlayerCardsAux(game, $card1, 1, added, animated_deck);
+            added = drawPlayerCardsAux(game, $card2, 2, added, animated_deck);
+            added = drawPlayerCardsAux(game, $card3, 3, added, animated_deck);
+            added = drawPlayerCardsAux(game, $card4, 4, added, animated_deck);
+            added = drawPlayerCardsAux(game, $card5, 5, added, animated_deck);
+            added = drawPlayerCardsAux(game, $card6, 6, added, animated_deck);added = drawPlayerCardsAux(game, $card7, 7, added, animated_deck);
+            added = drawPlayerCardsAux(game, $card8, 8, added, animated_deck);
+            added = drawPlayerCardsAux(game, $card9, 9, added, animated_deck);
+            
+            space_out(added, game.cards_dealt);
+            break;
+        
+    }
+    return added;
+}
+
+function removePlayerCards(added){
+    added.forEach(
+        function(toUnmount, i){
+            toUnmount.unmount();
+        }
+    );
+}
 
 start = false;
 cardChosen = false;
 numSelected = -1;
-game = new Game();
 
 async function run() {
-    dt = 900;
+    game = new Game();
+    dt = 300;
     added = [];
     opp = [];
     tmp_rd = 10;
-    // while (!start){
-    //     await sleep(dt); 
-    // }
     for (var i = 0; i < tmp_rd; i += 1) {
+        while (start){
+            await sleep(dt); 
+        }
         console.log("play " + (i + 1));
         game.update_round();
         game.deal_to_users();
@@ -724,8 +695,7 @@ async function run() {
         opp = drawOpponentCards(game, Deck(true), opp);
         game.set_wildcard();
         wild = drawWild(game.wildcard, Deck(true));
-        game.set_random_calls();
-        await playing_phase(game);
+        game.play_round();
         await sleep(dt); 
         if (i < tmp_rd - 1){removePlayerCards(added);}
         if (i < tmp_rd - 1){removePlayerCards(opp);}
@@ -741,6 +711,7 @@ async function reset() {
     if (i < tmp_rd - 1){wild.unmount();}
     game.reset_users();
 }
+// run();
 
 var $card1 = document.getElementById('card1');
 var $card2 = document.getElementById('card2');
@@ -757,12 +728,8 @@ var $topPlayer = document.getElementById('topPlayer');
 var $rightPlayer = document.getElementById('rightPlayer');
 var $deck = document.getElementById('deck');
 
-var $player0Played = document.getElementById('player0Played');
-var $player1Played = document.getElementById('player1Played');
-var $player2Played = document.getElementById('player2Played');
-var $player3Played = document.getElementById('player3Played');
-
 var gameDeck = Deck(true);
+// var card = gameDeck.cards[0];
 
 var $topbar = document.getElementById('topbar');
 
@@ -790,8 +757,6 @@ $topbar.appendChild($sort);
 let selection = null;
 
 $start.addEventListener('click', function start(){run(); start = true;});
-
-{run(); start = true;}
 
 // $card1.addEventListener('click', function handleClick(){selection = 1; clearInterval(myInterval);});
 $card2.addEventListener('click', function handleClick(){console.log("Card 2 Clicked!")});
@@ -846,7 +811,3 @@ document.addEventListener('keydown', function(event) {
 			break;
     }
 });
-
-card = new Card(7, 1).look(Deck(true));
-card.setSide('front');
-card.mount($player0Played);
