@@ -4,8 +4,8 @@ function sleep(ms) {
 
 function drawOpponentCards(opponent, number){
     var cont;
-    console.log('opponent');
-    console.log(opponent);
+    
+    
     switch(opponent){
         case 1:
             cont = $leftPlayer;
@@ -35,7 +35,6 @@ function drawOpponentCards(opponent, number){
 
 function drawPlayerCardsAux(game, card_container,number, added, animated_deck){
     card = game.users[0].cards[number - 1].look(animated_deck);
-    // console.log(card);
     card.mount(card_container);
     card.setSide('front')
     added.push(card);
@@ -191,7 +190,6 @@ function drawPlayerCards(game, animated_deck){
 }
 
 function removePlayerCards(added){
-    console.log(added);
     added.forEach(
         function(toUnmount, i){
             try {
@@ -229,19 +227,24 @@ function playOppCard(opponent, anim_card){
     
 }
 
-function resetCalled(){
+function resetText(){
     $called0.innerHTML = "Called: -";
     $called1.innerHTML = "Called: -";
     $called2.innerHTML = "Called: -";
     $called3.innerHTML = "Called: -";
-}
 
-// function playOppCard(opp_num){
-//     switch (opp_num){
-//         case 1:
-            
-//     }
-// }
+    $taken0.innerHTML = "Taken: -";
+    $taken1.innerHTML = "Taken: -";
+    $taken2.innerHTML = "Taken: -";
+    $taken3.innerHTML = "Taken: -";
+
+    $score0.innerHTML = "Score: -";
+    $score1.innerHTML = "Score: -";
+    $score2.innerHTML = "Score: -";
+    $score3.innerHTML = "Score: -";
+
+    
+}
 
 class Card {
     constructor(value, suit) {
@@ -572,7 +575,7 @@ class Game {
                     await sleep(1000);
                 }
                 call = callSelected;
-                numSelected = -1;
+                callSelected = -1;
             } else if (i === 4) {
                 call = this.get_random_call(already);
             } else {
@@ -735,7 +738,7 @@ class Game {
 
 
 async function playing_phase(game, added){
-    resetCalled();
+    resetText();
     while(callSelected < 0){
         await sleep(500);
     }
@@ -744,18 +747,20 @@ async function playing_phase(game, added){
     game.wildcard = new Card(0, 4);
 
     for (var i = 0; i < game.cards_dealt; i += 1) {
-        clearPlayed();
         game.display_scores();
         game.display_takens(game.users[0].taken, game.users[1].taken, game.users[2].taken, game.users[3].taken);
+        await sleep(300);
         $player0Played.innerHTML = "";
         game.first_suit = null;
         played = [];
 
         for (var j = 0; j < 4; j += 1) {
             player = (starter + j) % 4;
+
             choices = game.playable(player, game.get_wildsuit(), game.first_suit);
             if (player === 0) {
                 while (numSelected < 0){
+                    console.log('stck');
                     await sleep(1000);
                 }
                 choice = choices[numSelected - 1];
@@ -763,7 +768,7 @@ async function playing_phase(game, added){
                 playUserCard(anim_card);
                 numSelected = -1;
                 removePlayerCards(added);
-                added = added.filter((x) => {console.log(x);return x.pos != anim_card.pos});
+                added = added.filter((x) => {return x.pos != anim_card.pos});
                 game.users[player].cards = game.users[player].cards.filter(function(x){return x != choice});
                 drawPlayerCards(game, Deck(true));
             } else {
@@ -784,8 +789,14 @@ async function playing_phase(game, added){
         }
         played = played.slice(4 - starter) + played.slice(0, 4 - starter);
         starter = game.compute_winner(played);
+        console.log('winner');
+        console.log(starter);
         game.users[starter].taken += 1;
+        console.log('taken');
+        console.log(game.users[starter].taken);
         game.first_suit = null;
+        await sleep(500);
+        clearPlayed();
     }
 
     for (var i = 0; i < 4; i += 1) {
@@ -820,8 +831,8 @@ async function run() {
         wild = drawWild(game.wildcard, Deck(true));
         game.set_player_calls();
         added = await playing_phase(game, added); // this has opponents and users cards.
-        console.log("CP");
-        console.log(added);
+        
+        
         await sleep(dt); 
         if (i < tmp_rd - 1){removePlayerCards(added);}
         if (i < tmp_rd - 1){removePlayerCards(wild);}
