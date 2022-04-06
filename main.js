@@ -34,6 +34,17 @@ function drawPlayerCardsAux(game, card_container,number, added, animated_deck){
 }
 
 function drawWild(card, animatedDeck){
+    acc = [];
+    deck_place = new Card(7, 1).look(animatedDeck);
+    deck_place.mount($deck);
+    deck_place.animateTo({
+        delay: 100,
+        duration: 10,
+
+        ease: 'quartOut',
+        x: 3,
+        y: -5
+    });
     if (card === new Card(0, 4)){
         animatedCard = animatedDeck.cards[52];
     } else {
@@ -41,7 +52,10 @@ function drawWild(card, animatedDeck){
     }
     animatedCard.setSide('front');
     animatedCard.mount($deck);
-    return animatedCard;
+    acc.push(animatedCard);
+    acc.push(deck_place);
+    
+    return acc;
 }
 
 function space_out(added, len){
@@ -148,6 +162,7 @@ function drawPlayerCards(game, animated_deck){
 }
 
 function removePlayerCards(added){
+    console.log(added);
     added.forEach(
         function(toUnmount, i){
             toUnmount.unmount();
@@ -155,7 +170,7 @@ function removePlayerCards(added){
     );
 }
 
-function playCard(selection){
+function playUserCard(selection){
 
 }
 
@@ -379,7 +394,6 @@ class Game {
 
     playable(player, wildsuit, first_suit) {
         var firsts, joks, wilds;
-        // console.log(this.users[player].cards);
         firsts = (this.users[player].cards.filter(x => {
             return (x.suit === first_suit && !(x.value ===  15));
         }));
@@ -440,14 +454,21 @@ class Game {
         }
     }
 
-    set_random_calls() {
+    async set_player_calls() {
         var already, call, calls, id;
         calls = [];
         already = 0;
 
         for (var i = 1; i < 5; i += 1) {
             id = (this.dealer + i) % 4;
-            if (i === 4) {
+            if (id === 0){
+                while (numSelected < 0){
+                    await sleep(1000);
+                }
+                choice = choices[numSelected - 1];
+
+                numSelected = -1;
+            } else if (i === 4) {
                 call = this.get_random_call(already);
             } else {
                 call = this.get_random_call(null);
@@ -558,8 +579,6 @@ class Game {
             contains_wild = false;
 
             for (var i = 0; i < played.length; i++) {
-            //     console.log('played');
-            //     console.log(played);
                 if (played[i].suit === this.get_wildsuit()) {
                     contains_wild = true;
 
@@ -594,11 +613,9 @@ class Game {
     }
 
     async ask_call(max){ // temp
-        // return Math.floor(Math.random() * (max + 1));
         while (numSelected < 0){
             await sleep(300);
         }
-        console.log(numSelected);
         return numSelected;
     }
 
@@ -609,6 +626,7 @@ class Game {
     ask_card_choice(){
         return 0;
     }
+
     playing_phase() {
         var choice, choices, played, player, starter;
         starter = (this.dealer + 1) % 4;
@@ -623,13 +641,7 @@ class Game {
                 choices = this.playable(player, this.get_wildsuit(), this.first_suit);
                 if (player === 0) {
                     choices = this.playable(player, this.get_wildsuit(), this.first_suit);
-                    // console.log('playable');
-                    // console.log(playable);
-                    // var num = getCardChoice();
                     choice = choices[this.ask_card_choice(choices.length)];
-                    // choice = choices[num];
-                    
-                    
                 } else {
                     choice = this.get_card_choice(player, played, starter);
                 }
@@ -655,7 +667,6 @@ class Game {
 }
 
 async function playing_phase(game){
-    console.log('playing phase');
     var choice, choices, played, player, starter;
     starter = (game.dealer + 1) % 4;
     game.wildcard = new Card(0, 4);
@@ -676,7 +687,6 @@ async function playing_phase(game){
 
                 numSelected = -1;
             } else {
-                console.log('other');
                 choice = game.get_card_choice(player, played, starter);
             }
 
@@ -687,10 +697,6 @@ async function playing_phase(game){
                 game.first_suit = choice.suit;
             }
         }
-
-        console.log('i');
-        console.log(i);
-
         played = played.slice(4 - starter) + played.slice(0, 4 - starter);
         starter = game.compute_winner(played);
         game.users[starter].taken += 1;
@@ -701,7 +707,6 @@ async function playing_phase(game){
         game.users[i].score += game.get_player_score(i);
     }
 }
-
 
 start = false;
 cardChosen = false;
@@ -724,12 +729,12 @@ async function run() {
         opp = drawOpponentCards(game, Deck(true), opp);
         game.set_wildcard();
         wild = drawWild(game.wildcard, Deck(true));
-        game.set_random_calls();
+        game.set_player_calls();
         await playing_phase(game);
         await sleep(dt); 
         if (i < tmp_rd - 1){removePlayerCards(added);}
         if (i < tmp_rd - 1){removePlayerCards(opp);}
-        if (i < tmp_rd - 1){wild.unmount();}
+        if (i < tmp_rd - 1){removePlayerCards(wild);}
         game.reset_users();
     }
 }
@@ -787,21 +792,19 @@ $topbar.appendChild($fan);
 $topbar.appendChild($poker);
 $topbar.appendChild($sort);
 
-let selection = null;
-
 $start.addEventListener('click', function start(){run(); start = true;});
 
 {run(); start = true;}
 
-// $card1.addEventListener('click', function handleClick(){selection = 1; clearInterval(myInterval);});
-$card2.addEventListener('click', function handleClick(){console.log("Card 2 Clicked!")});
-$card3.addEventListener('click', function handleClick(){console.log("Card 3 Clicked!")});
-$card4.addEventListener('click', function handleClick(){console.log("Card 4 Clicked!")});
-$card5.addEventListener('click', function handleClick(){console.log("Card 5 Clicked!")});
-$card6.addEventListener('click', function handleClick(){console.log("Card 6 Clicked!")});
-$card7.addEventListener('click', function handleClick(){console.log("Card 7 Clicked!")});
-$card8.addEventListener('click', function handleClick(){console.log("Card 8 Clicked!")});
-$card9.addEventListener('click', function handleClick(){console.log("Card 9  Clicked!")});
+$card1.addEventListener('click', function handleClick(){ numSelected = 1;console.log("Card 1 Clicked!");});
+$card2.addEventListener('click', function handleClick(){numSelected = 2;console.log('Card 2 Clicked!');});
+$card3.addEventListener('click', function handleClick(){numSelected = 3;console.log('Card 3 Clicked!');});
+$card4.addEventListener('click', function handleClick(){numSelected = 4;console.log("Card 4 Clicked!")});
+$card5.addEventListener('click', function handleClick(){numSelected = 5;console.log("Card 5 Clicked!")});
+$card6.addEventListener('click', function handleClick(){numSelected = 6;console.log("Card 6 Clicked!")});
+$card7.addEventListener('click', function handleClick(){numSelected = 7;console.log("Card 7 Clicked!")});
+$card8.addEventListener('click', function handleClick(){numSelected = 8;console.log("Card 8 Clicked!")});
+$card9.addEventListener('click', function handleClick(){numSelected = 9;console.log("Card 9  Clicked!")});
 
 document.addEventListener('keydown', function(event) {
     switch(event.key){
@@ -846,7 +849,3 @@ document.addEventListener('keydown', function(event) {
 			break;
     }
 });
-
-card = new Card(7, 1).look(Deck(true));
-card.setSide('front');
-card.mount($player0Played);
