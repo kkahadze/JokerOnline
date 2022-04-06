@@ -2,33 +2,35 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-function drawOppHand(game, animated_deck, opp, cont, seed){
-    for (var i = 0; i < game.cards_dealt; i++){
-        newCard = new Card(6 + i, 0 + seed).look(animated_deck); 
-        newCard.mount(cont);
-        newCard.animateTo({
-            delay: 200 + i * 40, // wait 1 second + i * 2 ms
-            duration: 100,
-            ease: 'quartOut',
-            x: -10 * game.cards_dealt + i * 20,
+function drawOpponentCards(opponent, number){
+    var cont;
+    console.log('opponent');
+    console.log(opponent);
+    switch(opponent){
+        case 1:
+            cont = $leftPlayer;
+            break;
+        case 2:
+            cont = $topPlayer;
+            break;
+        case 3:
+            cont = $rightPlayer;
+            break;                        
+    }
+    cont.innerHTML = "";
+    for (var i = 0;  i < number; i++){
+        var card_ob = new Card(6 + i, 0);
+        var anim_ob = card_ob.look(Deck(true));
+        anim_ob.mount(cont);
+        anim_ob.animateTo({
+            delay: 0,
+            duration: 0,
+            ease: "quartOut",
+
+            x: i * 50,
             y: 0,
         });
-        opp.push(newCard);
-    }            
-    return opp;
-}
-
-function drawOpponentCards(game, animatedDeck, opp){
-
-    
-    all = [];
-    one = drawOppHand(game, animatedDeck, opp, $leftPlayer,1);
-    two = drawOppHand(game, animatedDeck, opp, $topPlayer, 2);
-    three = drawOppHand(game, animatedDeck, opp, $rightPlayer, 3);
-    all.push(one);
-    all.push(two);
-    all.push(three);
-    return all;
+    }
 }
 
 function drawPlayerCardsAux(game, card_container,number, added, animated_deck){
@@ -91,8 +93,15 @@ function clearPlayerCards(){
     $card9.innerHTML = ""; 
 }
 
+function clearPlayed(){
+    $player0Played.innerHTML = "";
+    $player1Played.innerHTML = "";
+    $player2Played.innerHTML = "";
+    $player3Played.innerHTML = "";
+}
+
 function drawPlayerCards(game, animated_deck){
-    // clearPlayerCards();
+    clearPlayerCards();
     switch (game.users[0].cards.length) {
         case 1:
             added = drawPlayerCardsAux(game, $card1, 1, added, animated_deck);
@@ -185,23 +194,47 @@ function removePlayerCards(added){
     console.log(added);
     added.forEach(
         function(toUnmount, i){
-            toUnmount.unmount();
+            try {
+                toUnmount.unmount();
+            } catch (DOMException){
+
+            }
         }
     );
 }
 
 function playUserCard(anim_card){
+    $player0Played.innerHTML = "";
     anim_card.unmount();
     anim_card.mount($player0Played);
     anim_card.setSide('front');
 }
 
-function playOppCard(opp_num){
-    switch (opp_num){
+function playOppCard(opponent, anim_card){
+    var cont;
+    switch(opponent){
         case 1:
-            
+            cont = $player1Played;
+            break;
+        case 2:
+            cont = $player2Played;
+            break;
+        case 3:
+            cont = $player3Played;
+            break
     }
+    cont.innerHTML = "";
+    anim_card.mount(cont);
+    anim_card.setSide('front');
+    
 }
+
+// function playOppCard(opp_num){
+//     switch (opp_num){
+//         case 1:
+            
+//     }
+// }
 
 class Card {
     constructor(value, suit) {
@@ -346,7 +379,7 @@ class Game {
                 break;
             case 3:
                 $called3.innerHTML = called + "";
-                break
+                break                                                       
                         
         }
     }
@@ -682,45 +715,8 @@ class Game {
     ask_card_choice(){
         return 0;
     }
-
-    // playing_phase() {
-    //     var choice, choices, played, player, starter;
-    //     starter = (this.dealer + 1) % 4;
-    //     this.wildcard = new Card(0, 4);
-
-    //     for (var i = 0; i < this.cards_dealt; i += 1) {
-    //         this.first_suit = null;
-    //         played = [];
-
-    //         for (var j = 0; j < 4; j += 1) {
-    //             player = (starter + j) % 4;
-    //             choices = this.playable(player, this.get_wildsuit(), this.first_suit);
-    //             if (player === 0) {
-    //                 choices = this.playable(player, this.get_wildsuit(), this.first_suit);
-    //                 choice = choices[this.ask_card_choice(choices.length)];
-    //             } else {
-    //                 choice = this.get_card_choice(player, played, starter);
-    //             }
-
-    //             this.users[player].cards.filter(function(x){x != choice});
-    //             played.push(choice);
-
-    //             if (j === 0) {
-    //                 this.first_suit = choice.suit;
-    //             }
-    //         }
-
-    //         played = played.slice(4 - starter) + played.slice(0, 4 - starter);
-    //         starter = this.compute_winner(played);
-    //         this.users[starter].taken += 1;
-    //         this.first_suit = null;
-    //     }
-
-    //     for (var i = 0; i < 4; i += 1) {
-    //         this.users[i].score += this.get_player_score(i);
-    //     }
-    // }
 }
+
 
 async function playing_phase(game, added){
     var choice, choices, played, player, starter;
@@ -728,6 +724,7 @@ async function playing_phase(game, added){
     game.wildcard = new Card(0, 4);
 
     for (var i = 0; i < game.cards_dealt; i += 1) {
+        clearPlayed();     
         $player0Played.innerHTML = "";
         game.first_suit = null;
         played = [];
@@ -744,27 +741,16 @@ async function playing_phase(game, added){
                 playUserCard(anim_card);
                 numSelected = -1;
                 removePlayerCards(added);
-                // console.log('prefilter');
-                // console.log(added);
-                // console.log('card');
-                // console.log(anim_card);
                 added = added.filter((x) => {console.log(x);return x.pos != anim_card.pos});
-                // console.log('added');
-                // console.log(added);
-                // console.log("player cards")
-                // console.log(game.users[player].cards);
-                // console.log('choice');
-                // console.log(choice);
                 game.users[player].cards = game.users[player].cards.filter(function(x){return x != choice});
                 drawPlayerCards(game, Deck(true));
             } else {
                 await sleep(300);
                 choice = game.get_card_choice(player, played, starter);
                 anim_card = choice.look(Deck(true));
-                // removePlayerCards(added);
-                game.users[player].cards.filter(function(x){x != choice});
-                drawOpponentCards(game,Deck(true),[]);
-
+                game.users[player].cards = game.users[player].cards.filter(function(x){return x != choice;});
+                drawOpponentCards(player, game.users[player].cards.length );
+                playOppCard(player, choice.look(Deck(true)));
             }
 
             
@@ -804,27 +790,29 @@ async function run() {
         game.update_round();
         game.deal_to_users();
         added = drawPlayerCards(game, Deck(true));
-        all_opps = drawOpponentCards(game, Deck(true), opp);
+        drawOpponentCards(1,game.cards_dealt);
+        drawOpponentCards(2,game.cards_dealt);
+        drawOpponentCards(3,game.cards_dealt);
         game.set_wildcard();
         wild = drawWild(game.wildcard, Deck(true));
         game.set_player_calls();
-        added = await playing_phase(game, added);
+        added = await playing_phase(game, added); // this has opponents and users cards.
+        console.log("CP");
+        console.log(added);
         await sleep(dt); 
         if (i < tmp_rd - 1){removePlayerCards(added);}
-        if (i < tmp_rd - 1){removePlayerCards(all_opps[0]);removePlayerCards(all_opps[1]);removePlayerCards(all_opps[2]);}
+        // console.log('all ops');
+        // console.log(all_opps[0]);
+        // if (i < tmp_rd - 1){removePlayerCards(all_opps[0]);removePlayerCards(all_opps[1]);removePlayerCards(all_opps[2]);}
         if (i < tmp_rd - 1){removePlayerCards(wild);}
         game.reset_users();
     }
 }
 
-async function reset() {
-    await sleep(dt); 
-    if (i < tmp_rd - 1){removePlayerCards(added);}
-    if (i < tmp_rd - 1){removePlayerCards(opp);}
-    if (i < tmp_rd - 1){wild.unmount();}
-    game.reset_users();
-}
 
+
+// creation of objects
+{
 var $card1 = document.getElementById('card1');
 var $card2 = document.getElementById('card2');
 var $card3 = document.getElementById('card3');
@@ -849,7 +837,7 @@ var $player0Called = document.getElementById('player0Called');
 var $player1Called = document.getElementById('player1Called');
 var $player2Called = document.getElementById('player2Called');
 var $player3Called = document.getElementById('player3Called');
-
+}
 var gameDeck = Deck(true);
 
 var $topbar = document.getElementById('topbar');
