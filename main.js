@@ -570,13 +570,13 @@ class Game {
 
         for (var i = 1; i < 5; i += 1) {
             id = (this.dealer + i) % 4;
-            if (id === 0){
+            if (id == 0){
                 while (callSelected < 0){
                     await sleep(1000);
                 }
                 call = callSelected;
                 callSelected = -1;
-            } else if (i === 4) {
+            } else if (i == 4) {
                 call = this.get_random_call(already);
             } else {
                 call = this.get_random_call(null);
@@ -746,23 +746,25 @@ async function playing_phase(game, added){
     starter = (game.dealer + 1) % 4;
     game.wildcard = new Card(0, 4);
 
+    console.log('Cards dealt' + game.cards_dealt);
     for (var i = 0; i < game.cards_dealt; i += 1) {
+        
         game.display_scores();
         game.display_takens(game.users[0].taken, game.users[1].taken, game.users[2].taken, game.users[3].taken);
         await sleep(300);
         $player0Played.innerHTML = "";
         game.first_suit = null;
         played = [];
-
         for (var j = 0; j < 4; j += 1) {
             player = (starter + j) % 4;
 
             choices = game.playable(player, game.get_wildsuit(), game.first_suit);
             if (player === 0) {
-                while (numSelected < 0){
-                    console.log('stck');
-                    await sleep(1000);
-                }
+                // while (numSelected < 0){
+                //     console.log('stck');
+                //     await sleep(1000);
+                // }
+                console.log('ინ');
                 choice = choices[numSelected - 1];
                 anim_card = choice.look(Deck(true));
                 playUserCard(anim_card);
@@ -844,30 +846,32 @@ async function run() {
 
 // creation of objects
 {
-var $card1 = document.getElementById('card1');
-var $card2 = document.getElementById('card2');
-var $card3 = document.getElementById('card3');
-var $card4 = document.getElementById('card4');
-var $card5 = document.getElementById('card5');
-var $card6 = document.getElementById('card6');
-var $card7 = document.getElementById('card7');
-var $card8 = document.getElementById('card8');
-var $card9 = document.getElementById('card9');
+    var $card1 = document.getElementById('card1');
+    var $card2 = document.getElementById('card2');
+    var $card3 = document.getElementById('card3');
+    var $card4 = document.getElementById('card4');
+    var $card5 = document.getElementById('card5');
+    var $card6 = document.getElementById('card6');
+    var $card7 = document.getElementById('card7');
+    var $card8 = document.getElementById('card8');
+    var $card9 = document.getElementById('card9');
 
-var $leftPlayer = document.getElementById('leftPlayer');
-var $topPlayer = document.getElementById('topPlayer');
-var $rightPlayer = document.getElementById('rightPlayer');
-var $deck = document.getElementById('deck');
+    var $leftPlayer = document.getElementById('leftPlayer');
+    var $topPlayer = document.getElementById('topPlayer');
+    var $rightPlayer = document.getElementById('rightPlayer');
+    var $deck = document.getElementById('deck');
 
-var $player0Played = document.getElementById('player0Played');
-var $player1Played = document.getElementById('player1Played');
-var $player2Played = document.getElementById('player2Played');
-var $player3Played = document.getElementById('player3Played');
+    var $player0Played = document.getElementById('player0Played');
+    var $player1Played = document.getElementById('player1Played');
+    var $player2Played = document.getElementById('player2Played');
+    var $player3Played = document.getElementById('player3Played');
 
-var $player0Called = document.getElementById('player0Called');
-var $player1Called = document.getElementById('player1Called');
-var $player2Called = document.getElementById('player2Called');
-var $player3Called = document.getElementById('player3Called');
+    var $player0Called = document.getElementById('player0Called');
+    var $player1Called = document.getElementById('player1Called');
+    var $player2Called = document.getElementById('player2Called');
+    var $player3Called = document.getElementById('player3Called');
+
+    var $alertBox = document.getElementById('alertBox');
 }
 var gameDeck = Deck(true);
 
@@ -908,6 +912,8 @@ $card6.addEventListener('click', function handleClick(){numSelected = 6;console.
 $card7.addEventListener('click', function handleClick(){numSelected = 7;console.log("Card 7 Clicked!")});
 $card8.addEventListener('click', function handleClick(){numSelected = 8;console.log("Card 8 Clicked!")});
 $card9.addEventListener('click', function handleClick(){numSelected = 9;console.log("Card 9  Clicked!")});
+
+
 
 document.addEventListener('keydown', function(event) {
     switch(event.key){
