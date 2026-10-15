@@ -1,0 +1,120 @@
+:root { color-scheme: light; --ink: #213d34; --paper: #f4f1e9; --green: #174c40; --gold: #edcd82; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 15px/1.5 system-ui, sans-serif; }
+a { color: inherit; text-underline-offset: 4px; }
+button { font: inherit; cursor: pointer; }
+button:disabled { cursor: default; }
+button:focus-visible, a:focus-visible, summary:focus-visible { outline: 3px solid #b27716; outline-offset: 4px; }
+.masthead, main, footer { max-width: 1280px; margin: auto; padding-left: 40px; padding-right: 40px; }
+.masthead { min-height: 90px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #d7d9ce; }
+.brand { font-weight: 800; letter-spacing: 3px; text-decoration: none; font-size: 20px; }
+.brand > span:first-child { color: #9b6e24; font-size: 27px; padding-right: 8px; }
+.brand-sub { font-size: 10px; letter-spacing: 2px; font-weight: 500; }
+nav { display: flex; align-items: center; gap: 26px; font-size: 13px; }
+nav a { text-decoration: none; }
+.quiet { background: transparent; border: 1px solid #bac4b7; padding: 8px 15px; border-radius: 5px; color: var(--ink); }
+.intro { margin: 34px 0 26px; }
+.eyebrow { font-size: 10px; font-weight: 700; letter-spacing: 2px; }
+h1, h2 { font-family: Georgia, serif; font-weight: 400; }
+h1 { margin: 0; font-size: clamp(34px, 4vw, 48px); line-height: 1.15; letter-spacing: -1.5px; }
+.intro > p:last-child { color: #647469; margin-top: 8px; }
+.game-layout { display: grid; grid-template-columns: minmax(0, 1fr) 285px; gap: 22px; }
+.play-area { border-radius: 12px; overflow: hidden; background: var(--green); box-shadow: 0 8px 24px #173a2410; }
+.table-meta { padding: 14px 24px; display: flex; justify-content: space-between; gap: 10px; color: #e3e9dd; background: #123e36; font-size: 12px; }
+.felt { padding: 24px 26px 16px; background: radial-gradient(ellipse at 50% 40%, #245d4f, #174c40 70%); }
+.opponents { display: flex; justify-content: space-around; text-align: center; color: #f6f4e9; }
+.opponent { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.opponent small { color: #c1d3c7; font-size: 11px; }
+.avatar { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; color: #efe7cb; background: #ffffff0c; border: 1px solid #d9e6ce50; font: 18px Georgia, serif; margin-bottom: 4px; }
+.center-table { text-align: center; padding: 19px 0 24px; }
+.center-table .eyebrow { color: #b6ccbd; font-size: 9px; margin: 6px 0 15px; }
+.trick { display: flex; justify-content: center; align-items: center; gap: 18px; min-height: 146px; }
+.empty-table { color: #b2cabb; font: italic 20px Georgia, serif; }
+.trick-slot { display: flex; flex-direction: column; align-items: center; gap: 6px; color: #dbe8dc; font-size: 11px; }
+.trick-slot.winner > .card { box-shadow: 0 0 0 3px var(--gold); }
+.hand-heading { display: flex; justify-content: space-between; gap: 10px; color: #c9d9cd; font-size: 9px; letter-spacing: 1px; margin: 0 0 14px; }
+.hand-heading > span:last-child { letter-spacing: 0; }
+.hand { display: flex; gap: 7px; justify-content: center; min-height: 137px; padding-bottom: 12px; }
+.card { position: relative; width: 76px; height: 108px; flex: 0 1 76px; min-width: 0; border: 1px solid #eee7d7; border-radius: 6px; background: #fffdf6; color: #23372f; box-shadow: 0 3px 6px #001c2130; font-family: Georgia, serif; text-align: left; padding: 0; }
+.card.red { color: #b94739; }
+.card.joker { color: #936a21; background: #fcf3d9; }
+.corner { position: absolute; top: 5px; left: 7px; line-height: 1; font-size: 18px; }
+.corner small { display: block; text-align: center; font-size: 14px; margin-top: 2px; }
+.card-symbol { display: grid; height: 100%; place-items: center; font-size: 34px; }
+.card-bottom { position: absolute; right: 7px; bottom: 5px; font-size: 15px; }
+.joker .card-bottom { font: 7px system-ui, sans-serif; letter-spacing: 1px; }
+.hand .card:not(:disabled) { border: 2px solid var(--gold); }
+.hand .card:not(:disabled):hover { transform: translateY(-7px); }
+.hand .card:disabled { background: #e3e3d7; color: #68746a; }
+.hand .card.red:disabled { color: #a3776c; }
+.hand .card.joker:disabled { color: #947a49; }
+.key-hint { position: absolute; bottom: -24px; left: 0; width: 100%; text-align: center; color: #c2d5c8; font: 10px system-ui, sans-serif; }
+.action-bar { background: #103b32; padding: 17px 24px; min-height: 92px; display: flex; align-items: center; justify-content: space-between; gap: 18px; color: #edf1e4; }
+.action-bar p { margin: 0; font-size: 13px; max-width: 400px; }
+.actions { display: flex; flex-wrap: wrap; gap: 6px; flex-shrink: 0; max-width: 55%; }
+.actions button { background: var(--gold); color: #253b30; border: none; border-radius: 4px; padding: 10px 16px; font-size: 12px; font-weight: 700; min-height: 40px; }
+.actions button[data-bid] { min-width: 40px; padding: 8px; }
+.actions button:disabled { background: #486458; color: #a8b8ac; text-decoration: line-through; }
+.score-panel { background: #fffdf7; border: 1px solid #dfdfd2; border-radius: 12px; padding: 23px; }
+.score-panel .eyebrow { color: #788676; font-size: 9px; }
+h2 { font-size: 26px; margin: 8px 0; }
+.score-hint { color: #7a8276; font-size: 12px; margin-top: 0; margin-bottom: 24px; }
+table { width: 100%; border-collapse: collapse; font-size: 12px; }
+th, td { text-align: right; padding: 12px 3px; border-bottom: 1px solid #e9e9de; }
+th:first-child { text-align: left; }
+thead th { color: #7b8677; font-size: 10px; font-weight: 500; }
+tbody th { font-weight: 500; }
+tbody th small { display: block; color: #7b8677; font-size: 9px; }
+tbody td:last-child { font-weight: 700; }
+.you { color: #9b6b18; }
+.result { margin-top: 20px; font-size: 13px; font-weight: 600; }
+.variant { border-top: 1px solid #e9e9de; padding-top: 16px; margin-top: 26px; font-size: 11px; color: #7b8677; }
+#history-details { margin-top: 18px; font-size: 11px; }
+#history { max-height: 180px; overflow-y: auto; padding-left: 20px; }
+#history li { margin: 10px 0; }
+summary { cursor: pointer; }
+.rules { margin-top: 26px; padding: 18px 0; border-top: 1px solid #d7d9ce; border-bottom: 1px solid #d7d9ce; font-size: 13px; }
+.rules > summary { font-weight: 600; }
+.rules > summary span { float: right; color: #7b8677; font-size: 11px; font-weight: 400; }
+.rules-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 32px; padding-top: 20px; }
+.rules h2 { font-size: 22px; }
+.rules p, .rules li { color: #647469; }
+.rules ul { padding-left: 18px; }
+footer { display: flex; justify-content: space-between; padding-top: 24px; padding-bottom: 30px; font-size: 11px; color: #778372; }
+@media (max-width: 1000px) {
+  .masthead, main, footer { padding-left: 22px; padding-right: 22px; }
+  .game-layout { grid-template-columns: minmax(0, 1fr) 245px; gap: 14px; }
+  .score-panel { padding: 16px; }
+  .felt { padding-left: 16px; padding-right: 16px; }
+  .action-bar { flex-direction: column; align-items: flex-start; }
+  .actions { max-width: 100%; }
+  .hand { gap: 4px; }
+}
+@media (max-width: 760px) {
+  .game-layout { grid-template-columns: minmax(0, 1fr); }
+  .masthead { min-height: 72px; }
+  .brand-sub { display: none; }
+  nav { gap: 14px; font-size: 12px; }
+  .intro { margin: 24px 0; }
+  .score-panel { padding: 20px; }
+  .rules-grid { grid-template-columns: 1fr; gap: 10px; }
+}
+@media (max-width: 440px) {
+  .masthead, main, footer { padding-left: 12px; padding-right: 12px; }
+  .brand { font-size: 17px; letter-spacing: 1px; }
+  .brand > span:first-child { padding-right: 2px; }
+  nav { gap: 10px; }
+  .quiet { padding: 7px 10px; }
+  .table-meta { padding: 12px; font-size: 10px; }
+  .felt { padding-left: 12px; padding-right: 12px; }
+  .hand { flex-wrap: wrap; gap: 24px 5px; }
+  .hand .card { flex: 0 0 52px; height: 84px; }
+  .hand-area { padding-bottom: 8px; }
+  .hand-heading { font-size: 8px; }
+  .trick { gap: 10px; }
+  .trick .card { width: 57px; height: 88px; flex-basis: auto; }
+  .card-symbol { font-size: 28px; }
+  .corner { font-size: 16px; left: 5px; }
+  .corner small { font-size: 12px; }
+  .action-bar { padding: 16px; }
+}

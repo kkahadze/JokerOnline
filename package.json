@@ -1,6 +1,22 @@
-// {
-//   "dependencies": {
-//     "deck-of-cards": "^0.1.8"
-//   },
-//   "type": "module"
-// }
+{
+  "name": "joker-online",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "A browser-based Joker card game for one player and three bots.",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "node scripts/serve.js",
+    "start": "npm run dev",
+    "build": "node scripts/build.js",
+    "preview": "node scripts/serve.js dist",
+    "test": "node --test tests/*.test.js",
+    "test:e2e": "playwright test",
+    "check": "npm test && npm run build && npm run test:e2e"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.64.1"
+  }
+}
