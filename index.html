@@ -1,52 +1,37 @@
-<!DOCTYPE HTML>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Joker Online</title>
-    <link rel="stylesheet" href="node_modules/deck-of-cards/example/example.css">
-    <link rel="stylesheet" href="./style.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#123e36">
+  <meta name="description" content="Play a simplified Georgian Joker card game against three bots. Call your tricks, play your hand, and keep your promise.">
+  <title>Joker Online — Take your seat</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="./style.css">
+  <script type="module" src="./src/main.js"></script>
 </head>
 <body>
-    <div id="main">
-        <g>
-            <div id="alertBox"> 
-                <text id="alertText"> Call a number by pressing a number key. Play a card by clicking on it.</text>
-            </div>
-            <div id="card1"></div>
-            <div id="card2"></div>
-            <div id="card3"></div>
-            <div id="card4"></div>
-            <div id="card5"></div>
-            <div id="card6"></div>
-            <div id="card7"></div>
-            <div id="card8"></div>
-            <div id="card9"></div>
-            <div id="leftPlayer"></div>
-            <div id="topPlayer"></div>
-            <div id="rightPlayer"></div>
-            <div id="deck"></div>
-            <div id="player0Played"></div>
-            <div id="player1Played"></div>
-            <div id="player2Played"></div>
-            <div id="player3Played"></div>
-            <div id="player0Called">
-                <p id="called0"></p><p id="taken0"></p><p id="score0"></p>
-            </div>
-            <div id="player1Called">
-                <p id="called1"></p><p id="taken1"></p><p id="score1"></p>
-            </div>
-            <div id="player2Called">
-                <p id="called2"></p><p id="taken2"></p><p id="score2"></p>
-            </div>
-            <div id="player3Called">
-                <p id="called3"></p><p id="taken3"></p><p id="score3"></p>
-            </div>
-            
-        </g>
-        <div id="topbar"></div><a href="https://github.com/pakastin/deck-of-cards">
-    <script src="node_modules/deck-of-cards/dist/deck.min.js"></script>
-    <!-- <script type="text/javascript" src="game.js"></script> -->
-    <script type="text/javascript" src="main.js"></script>
+  <header class="masthead">
+    <a class="brand" href="./"><span aria-hidden="true">✦</span> JOKER <span class="brand-sub">ONLINE</span></a>
+    <nav aria-label="Game controls"><a href="#rules">How to play</a><button id="restart" class="quiet" type="button">New game</button></nav>
+  </header>
+  <main>
+    <div class="intro"><p class="eyebrow">FOUR SEATS. ONE PROMISE.</p><h1>Play your hand.</h1><p>Call your tricks. Make them count.</p></div>
+    <section class="game-layout" aria-label="Joker game">
+      <div class="play-area">
+        <div class="table-meta"><span id="deal-label">Ready when you are</span><span id="trump-label">24 deals · 3 opponents</span></div>
+        <div class="felt">
+          <div id="opponents" class="opponents"></div>
+          <div class="center-table"><p class="eyebrow">ON THE TABLE</p><div id="trick" class="trick" aria-label="Cards played this trick"></div></div>
+          <div class="hand-area"><div class="hand-heading"><span>YOUR HAND</span><span id="hand-note">A little luck. A little nerve.</span></div><div id="hand" class="hand" aria-label="Your cards"></div></div>
+        </div>
+        <div class="action-bar"><p id="status" role="status" aria-live="polite"></p><div id="actions" class="actions"></div></div>
+      </div>
+      <aside class="score-panel" aria-label="Scoreboard"><p class="eyebrow">THE LONG GAME</p><h2>Scoreboard</h2><p class="score-hint">An exact call goes a long way.</p><table><thead><tr><th scope="col">Player</th><th scope="col">Call</th><th scope="col">Taken</th><th scope="col">Score</th></tr></thead><tbody id="scores"></tbody></table><div id="result" class="result"></div><details id="history-details"><summary>Deal history</summary><ol id="history"></ol></details><p class="variant">Simplified Joker<br>One human. Three local bots.</p></aside>
+    </section>
+    <details id="rules" class="rules"><summary>How to play <span>Rules & scoring</span></summary><div class="rules-grid"><div><h2>Keep your promise</h2><p>Each player calls how many tricks they will take. The dealer calls last and cannot make the total calls equal the number of cards dealt. Choose a call with the buttons or number keys 0–9.</p><p>Play a highlighted card by clicking it or pressing its numbered shortcut. Follow the led suit if possible; otherwise play trump if you have it. A Joker is always legal. The winner leads the next trick.</p></div><div><h2>A familiar house variant</h2><p>Trump is the undealt face-up card's suit. A turned-up Joker means no trump. The eight nine-card deals also have no trump. Jokers always beat ordinary cards; the last Joker played wins. A Joker lead has no suit, so the next players must play trump if possible, or any card.</p><p>This preserves the original project's simplified variant: no Joker declarations, trump selection, or section bonuses. The 24 deals are 1–8, four 9s, 8–1, then four 9s.</p></div><div><h2>Every trick counts</h2><ul><li>Exact call: 50 × tricks + 50 points.</li><li>Call and take every trick: 100 × tricks.</li><li>Miss your call: 10 × tricks taken.</li><li>Call above zero and take none: −200.</li></ul><p>The highest score after 24 deals wins. Ties are shared.</p></div></div></details>
+    <noscript><p class="notice">Please enable JavaScript to play Joker Online.</p></noscript>
+  </main>
+  <footer>Joker, at your own table. <a href="https://github.com/kkahadze/JokerOnline">View source ↗</a></footer>
 </body>
-<script src="https://d3js.org/d3.v5.min.js"></script>
-</html>  
+</html>
